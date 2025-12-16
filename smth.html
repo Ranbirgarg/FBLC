@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BusinessMonkey - Support Small Businesses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4f46e5",
+              secondary: "#6366f1",
+              accent: "#f59e0b",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .fade-in {
+        animation: fadeIn 0.3s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .business-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .hero-image {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+      }
+      .stats-card {
+        transition: all 0.3s ease;
+      }
+      .stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .monkey-logo {
+        font-size: 28px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Main App Container -->
+    <div id="app" class="min-h-screen">
+      <!-- Landing Page -->
+      <div
+        id="landing-page"
+        class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100"
+      >
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-xl"></i>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span>
+              </h1>
+            </div>
+            <div class="flex items-center space-x-6">
+              <nav class="hidden md:flex space-x-6">
+                <button
+                  onclick="showLanding()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Home
+                </button>
+                <button
+                  onclick="showHowItWorks()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  How it Works
+                </button>
+                <button
+                  onclick="showAbout()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  About
+                </button>
+                <button
+                  onclick="showContact()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Contact
+                </button>
+              </nav>
+              <button
+                onclick="showLogin()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </header>
+        <!-- Hero Section -->
+        <div class="hero-image relative">
+          <div class="max-w-7xl mx-auto px-4 py-24 text-center relative z-10">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+              Empower Your Local Business Ecosystem
+            </h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-4xl mx-auto">
+              BusinessMonkey connects small businesses with their communities
+              through smart discovery, direct communication, and exclusive
+              promotional tools.
+            </p>
+            <div
+              class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+            >
+              <button
+                onclick="showSignupPerson()"
+                class="bg-white text-indigo-600 border-2 border-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-50 transition-colors text-lg"
+              >
+                I'm a Customer - Free
+              </button>
+              <button
+                onclick="showSignupBusiness()"
+                class="bg-amber-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-amber-600 transition-colors flex items-center space-x-2 text-lg"
+              >
+                <i class="fas fa-dollar-sign mr-2"></i>
+                <span>Business Owner - $2.99/month</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Stats Section -->
+        <div class="bg-white py-16">
+          <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                BusinessMonkey By The Numbers
+              </h2>
+              <p class="text-gray-600 max-w-2xl mx-auto">
+                We're making a real impact in local communities across the
+                country.
+              </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+              <div
+                class="stats-card bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-xl text-center"
+              >
+                <div
+                  class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-store text-indigo-600 text-2xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-indigo-600 mb-2">500+</h3>
+                <p class="text-gray-700">Active Businesses</p>
+              </div>
+              <div
+                class="stats-card bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-xl text-center"
+              >
+                <div
+                  class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-users text-amber-600 text-2xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-amber-600 mb-2">10,000+</h3>
+                <p class="text-gray-700">Community Members</p>
+              </div>
+              <div
+                class="stats-card bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-xl text-center"
+              >
+                <div
+                  class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-chart-line text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-green-600 mb-2">
+                  $250,000+
+                </h3>
+                <p class="text-gray-700">Local Revenue Generated</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Testimonials Section -->
+        <div class="py-16 bg-gray-50">
+          <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                What Our Community Says
+              </h2>
+              <p class="text-gray-600 max-w-2xl mx-auto">
+                Don't just take our word for it - hear from real business owners
+                and customers.
+              </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                  <div
+                    class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-indigo-600 font-bold">SM</span>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="font-semibold">Sarah M.</h4>
+                    <p class="text-gray-600 text-sm">Customer</p>
+                  </div>
+                </div>
+                <p class="text-gray-700 italic">
+                  "BusinessMonkey helped me discover my favorite local bakery!
+                  The direct chat feature made it easy to ask about their
+                  gluten-free options. Now I'm a regular!"
+                </p>
+                <div class="mt-4 flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                  <div
+                    class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-amber-600 font-bold">MJ</span>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="font-semibold">Mike J.</h4>
+                    <p class="text-gray-600 text-sm">Coffee Shop Owner</p>
+                  </div>
+                </div>
+                <p class="text-gray-700 italic">
+                  "For just $2.99/month, BusinessMonkey has doubled my customer
+                  base! The coupon system is brilliant and the analytics help me
+                  understand my audience better."
+                </p>
+                <div class="mt-4 flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+              </div>
+              <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                  <div
+                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-green-600 font-bold">RL</span>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="font-semibold">Rachel L.</h4>
+                    <p class="text-gray-600 text-sm">Customer</p>
+                  </div>
+                </div>
+                <p class="text-gray-700 italic">
+                  "I love supporting local businesses, but never knew where to
+                  start. BusinessMonkey makes it so easy to find exactly what I
+                  need in my neighborhood!"
+                </p>
+                <div class="mt-4 flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Features Section -->
+        <div class="py-16 bg-white">
+          <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                Powerful Features for Everyone
+              </h2>
+              <p class="text-gray-600 max-w-2xl mx-auto">
+                Whether you're a customer or business owner, BusinessMonkey has
+                everything you need to succeed.
+              </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12">
+              <div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                  For Customers
+                </h3>
+                <div class="space-y-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-search text-blue-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Smart Discovery
+                      </h4>
+                      <p class="text-gray-600">
+                        Find businesses by category, location, or keywords with
+                        our advanced search system.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-comment-dots text-green-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Direct Communication
+                      </h4>
+                      <p class="text-gray-600">
+                        Chat directly with business owners to get personalized
+                        recommendations and answers.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-tag text-purple-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Exclusive Deals
+                      </h4>
+                      <p class="text-gray-600">
+                        Access special coupons and discounts that you won't find
+                        anywhere else.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                  For Business Owners
+                </h3>
+                <div class="space-y-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-chart-line text-indigo-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Business Analytics
+                      </h4>
+                      <p class="text-gray-600">
+                        Track your views, sales, and customer engagement with
+                        detailed statistics.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-bullhorn text-red-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Promotional Tools
+                      </h4>
+                      <p class="text-gray-600">
+                        Create and manage coupons to attract new customers and
+                        reward loyal ones.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <div
+                        class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-headset text-yellow-600"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="text-lg font-semibold text-gray-800">
+                        Customer Support
+                      </h4>
+                      <p class="text-gray-600">
+                        Manage all your customer inquiries in one place with our
+                        integrated messaging system.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CTA Section -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 py-16">
+          <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+              Ready to Join BusinessMonkey?
+            </h2>
+            <p class="text-indigo-100 mb-8 max-w-2xl mx-auto text-lg">
+              Start supporting local businesses today or grow your own business
+              with our powerful platform.
+            </p>
+            <div
+              class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+            >
+              <button
+                onclick="showSignupPerson()"
+                class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-50 transition-colors text-lg"
+              >
+                Join as Customer - Free
+              </button>
+              <button
+                onclick="showSignupBusiness()"
+                class="bg-amber-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-amber-600 transition-colors text-lg border-2 border-white"
+              >
+                Business Signup - $2.99/mo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- How It Works Page -->
+      <div id="how-it-works-page" class="hidden min-h-screen bg-white">
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-xl"></i>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span>
+              </h1>
+            </div>
+            <div class="flex items-center space-x-6">
+              <nav class="hidden md:flex space-x-6">
+                <button
+                  onclick="showLanding()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Home
+                </button>
+                <button
+                  onclick="showHowItWorks()"
+                  class="text-indigo-600 font-medium border-b-2 border-indigo-600"
+                >
+                  How it Works
+                </button>
+                <button
+                  onclick="showAbout()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  About
+                </button>
+                <button
+                  onclick="showContact()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Contact
+                </button>
+              </nav>
+              <button
+                onclick="showLogin()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="max-w-7xl mx-auto px-4 py-16">
+          <h1 class="text-4xl font-bold text-center mb-12">
+            How BusinessMonkey Works
+          </h1>
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="text-2xl font-bold text-indigo-600">1</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Sign Up</h3>
+              <p class="text-gray-600">
+                Create your free account as a customer or subscribe as a
+                business owner for just $2.99/month.
+              </p>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="text-2xl font-bold text-indigo-600">2</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Discover</h3>
+              <p class="text-gray-600">
+                Browse our curated directory of local businesses with smart
+                search and filtering options.
+              </p>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="text-2xl font-bold text-indigo-600">3</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Connect</h3>
+              <p class="text-gray-600">
+                Chat directly with business owners to ask questions, get
+                recommendations, and build relationships.
+              </p>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="text-2xl font-bold text-indigo-600">4</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Grow & Support</h3>
+              <p class="text-gray-600">
+                Enjoy exclusive deals while helping local businesses thrive in
+                your community.
+              </p>
+            </div>
+          </div>
+          <div class="mt-16 text-center">
+            <h2 class="text-2xl font-bold mb-6">Ready to get started?</h2>
+            <div class="flex justify-center space-x-6">
+              <button
+                onclick="showSignupPerson()"
+                class="bg-white text-indigo-600 border-2 border-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
+              >
+                Join as Customer - Free
+              </button>
+              <button
+                onclick="showSignupBusiness()"
+                class="bg-amber-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition-colors flex items-center space-x-2"
+              >
+                <i class="fas fa-dollar-sign mr-2"></i>
+                <span>Business Signup - $2.99/mo</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- About Page -->
+      <div id="about-page" class="hidden min-h-screen bg-white">
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-xl"></i>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span>
+              </h1>
+            </div>
+            <div class="flex items-center space-x-6">
+              <nav class="hidden md:flex space-x-6">
+                <button
+                  onclick="showLanding()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Home
+                </button>
+                <button
+                  onclick="showHowItWorks()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  How it Works
+                </button>
+                <button
+                  onclick="showAbout()"
+                  class="text-indigo-600 font-medium border-b-2 border-indigo-600"
+                >
+                  About
+                </button>
+                <button
+                  onclick="showContact()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Contact
+                </button>
+              </nav>
+              <button
+                onclick="showLogin()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="max-w-7xl mx-auto px-4 py-16">
+          <h1 class="text-4xl font-bold text-center mb-12">
+            About BusinessMonkey
+          </h1>
+
+          <!-- What is BusinessMonkey? -->
+          <div class="mb-16">
+            <h2 class="text-2xl font-bold text-center mb-6">
+              What is BusinessMonkey?
+            </h2>
+            <p class="text-gray-700 text-center max-w-4xl mx-auto">
+              BusinessMonkey is a community-powered digital platform that
+              connects local small businesses with their neighbors. We provide
+              business owners with affordable tools to showcase their offerings,
+              engage directly with customers, and grow sustainably— while
+              empowering everyday people to discover, support, and build
+              relationships with the local shops and services that make their
+              community unique.
+            </p>
+          </div>
+
+          <!-- Our Vision -->
+          <div class="mb-16">
+            <h2 class="text-2xl font-bold text-center mb-6">Our Vision</h2>
+            <p class="text-gray-700 text-center max-w-4xl mx-auto">
+              We envision vibrant neighborhoods where small businesses thrive as
+              the heart of local economies. Through transparency, direct
+              connection, and mutual support, BusinessMonkey aims to create a
+              future where every local entrepreneur has the tools to succeed and
+              every community member feels invested in their neighborhood’s
+              success.
+            </p>
+          </div>
+
+          <!-- Our Mission (Original) -->
+          <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
+              <p class="text-gray-700 mb-4">
+                BusinessMonkey was founded with a simple mission: to bridge the
+                gap between local small businesses and their communities. We
+                believe that small businesses are the heartbeat of our
+                neighborhoods, and they deserve a platform that helps them
+                thrive in the digital age.
+              </p>
+              <p class="text-gray-700">
+                Our playful monkey mascot represents agility, intelligence, and
+                community - the perfect qualities for navigating the modern
+                business landscape while staying connected to local roots.
+              </p>
+            </div>
+            <div class="bg-indigo-50 p-8 rounded-xl">
+              <h3 class="text-xl font-semibold mb-4">
+                Why Choose BusinessMonkey?
+              </h3>
+              <ul class="space-y-3">
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span
+                    >Support local economies and keep money in your
+                    community</span
+                  >
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span>Discover unique businesses you might have missed</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span
+                    >Get personalized service from real business owners</span
+                  >
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                  <span
+                    >Enjoy exclusive deals and build lasting relationships</span
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <h2 class="text-2xl font-bold mb-8">Join Our Community Today</h2>
+            <div class="flex justify-center space-x-6">
+              <button
+                onclick="showSignupPerson()"
+                class="bg-white text-indigo-600 border-2 border-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
+              >
+                I'm a Customer
+              </button>
+              <button
+                onclick="showSignupBusiness()"
+                class="bg-amber-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-600 transition-colors"
+              >
+                I'm a Business Owner
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Contact Page -->
+      <div id="contact-page" class="hidden min-h-screen bg-white">
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-xl"></i>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span>
+              </h1>
+            </div>
+            <div class="flex items-center space-x-6">
+              <nav class="hidden md:flex space-x-6">
+                <button
+                  onclick="showLanding()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  Home
+                </button>
+                <button
+                  onclick="showHowItWorks()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  How it Works
+                </button>
+                <button
+                  onclick="showAbout()"
+                  class="text-gray-700 hover:text-indigo-600 font-medium"
+                >
+                  About
+                </button>
+                <button
+                  onclick="showContact()"
+                  class="text-indigo-600 font-medium border-b-2 border-indigo-600"
+                >
+                  Contact
+                </button>
+              </nav>
+              <button
+                onclick="showLogin()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="max-w-7xl mx-auto px-4 py-16">
+          <h1 class="text-4xl font-bold text-center mb-12">Contact Us</h1>
+          <div class="grid md:grid-cols-2 gap-12">
+            <div>
+              <h2 class="text-2xl font-bold mb-6">Get in Touch</h2>
+              <p class="text-gray-700 mb-8">
+                Have questions, feedback, or need support? We'd love to hear
+                from you! Our team is here to help you make the most of
+                BusinessMonkey.
+              </p>
+              <div class="space-y-4">
+                <div class="flex items-start">
+                  <i class="fas fa-envelope text-indigo-600 mt-1 mr-4"></i>
+                  <div>
+                    <h3 class="font-semibold">Email Us</h3>
+                    <p class="text-gray-600">support@businessmonkey.com</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <i class="fas fa-phone text-indigo-600 mt-1 mr-4"></i>
+                  <div>
+                    <h3 class="font-semibold">Call Us</h3>
+                    <p class="text-gray-600">(555) 123-4567</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <i
+                    class="fas fa-map-marker-alt text-indigo-600 mt-1 mr-4"
+                  ></i>
+                  <div>
+                    <h3 class="font-semibold">Our Location</h3>
+                    <p class="text-gray-600">
+                      123 Main Street, Suite 100<br />San Francisco, CA 94105
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-8 rounded-xl">
+              <h2 class="text-2xl font-bold mb-6">Send us a Message</h2>
+              <form onsubmit="handleContactForm(event)">
+                <div class="mb-4">
+                  <label class="block text-gray-700 mb-2">Name</label>
+                  <input
+                    type="text"
+                    id="contact-name"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Your Name"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    id="contact-email"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="your@email.com"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label class="block text-gray-700 mb-2">Subject</label>
+                  <input
+                    type="text"
+                    id="contact-subject"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="What's this about?"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label class="block text-gray-700 mb-2">Message</label>
+                  <textarea
+                    id="contact-message"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    rows="4"
+                    placeholder="Your message here..."
+                    required
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Login Modal -->
+      <div
+        id="login-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full fade-in">
+          <h2 class="text-2xl font-bold text-center mb-6">
+            Sign In to BusinessMonkey
+          </h2>
+          <form onsubmit="handleLogin(event)">
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Email</label>
+              <div class="relative">
+                <i
+                  class="fas fa-envelope absolute left-3 top-3 text-gray-400"
+                ></i>
+                <input
+                  type="email"
+                  id="login-email"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2">Password</label>
+              <div class="relative">
+                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                <input
+                  type="password"
+                  id="login-password"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2">I am a:</label>
+              <div class="flex space-x-4">
+                <label class="flex items-center">
+                  <input
+                    type="radio"
+                    name="user-type"
+                    value="person"
+                    checked
+                    class="mr-2"
+                  />
+                  Customer (Free)
+                </label>
+                <label class="flex items-center">
+                  <input
+                    type="radio"
+                    name="user-type"
+                    value="business"
+                    class="mr-2"
+                  />
+                  Business Owner ($2.99/mo)
+                </label>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Sign In
+            </button>
+          </form>
+          <div class="mt-4 text-center">
+            <button
+              onclick="showLanding()"
+              class="text-indigo-600 hover:text-indigo-800"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Signup Person Modal -->
+      <div
+        id="signup-person-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full fade-in">
+          <h2 class="text-2xl font-bold text-center mb-2">
+            Sign Up as Customer
+          </h2>
+          <p class="text-gray-600 text-center mb-6">It's completely FREE!</p>
+          <form onsubmit="handleSignupPerson(event)">
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Email</label>
+              <div class="relative">
+                <i
+                  class="fas fa-envelope absolute left-3 top-3 text-gray-400"
+                ></i>
+                <input
+                  type="email"
+                  id="person-email"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2">Password</label>
+              <div class="relative">
+                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                <input
+                  type="password"
+                  id="person-password"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Create Free Account
+            </button>
+          </form>
+          <div class="mt-4 text-center">
+            <button
+              onclick="showLanding()"
+              class="text-indigo-600 hover:text-indigo-800"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Signup Business Modal -->
+      <div
+        id="signup-business-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full fade-in">
+          <h2 class="text-2xl font-bold text-center mb-2">
+            Sign Up as Business Owner
+          </h2>
+          <p class="text-gray-600 text-center mb-6">$2.99 per month</p>
+          <form onsubmit="handleSignupBusiness(event)">
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Business Name</label>
+              <input
+                type="text"
+                id="business-name"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Your Business Name"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Business Type</label>
+              <select
+                id="business-type"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select Business Type</option>
+                <option value="Food & Beverage">Food & Beverage</option>
+                <option value="Retail">Retail</option>
+                <option value="Services">Services</option>
+                <option value="Beauty & Wellness">Beauty & Wellness</option>
+                <option value="Home & Garden">Home & Garden</option>
+                <option value="Arts & Crafts">Arts & Crafts</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Location</label>
+              <div class="relative">
+                <i
+                  class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"
+                ></i>
+                <input
+                  type="text"
+                  id="business-location"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="City or Area"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Email</label>
+              <div class="relative">
+                <i
+                  class="fas fa-envelope absolute left-3 top-3 text-gray-400"
+                ></i>
+                <input
+                  type="email"
+                  id="business-email"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your@business.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2">Password</label>
+              <div class="relative">
+                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                <input
+                  type="password"
+                  id="business-password"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-colors"
+            >
+              Start $2.99/month Subscription
+            </button>
+          </form>
+          <div class="mt-4 text-center">
+            <button
+              onclick="showLanding()"
+              class="text-indigo-600 hover:text-indigo-800"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Business Dashboard -->
+      <div id="business-dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- Business Header -->
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-lg"></i>
+              </div>
+              <h1 class="text-xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span> Dashboard
+              </h1>
+            </div>
+            <button
+              onclick="logout()"
+              class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+        <!-- Business Navigation -->
+        <nav class="bg-white shadow-sm">
+          <div class="max-w-7xl mx-auto px-4">
+            <div class="flex space-x-8">
+              <button
+                onclick="showBusinessHome()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600"
+              >
+                <i class="fas fa-home mr-2"></i> Home
+              </button>
+              <button
+                onclick="showCouponMaker()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <i class="fas fa-tags mr-2"></i> Coupons
+              </button>
+              <button
+                onclick="showBusinessMessages()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <i class="fas fa-comment-dots mr-2"></i> Messages
+              </button>
+              <button
+                onclick="showBusinessAccount()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <i class="fas fa-user mr-2"></i> Account
+              </button>
+            </div>
+          </div>
+        </nav>
+        <!-- Business Home Content -->
+        <div id="business-home-content" class="p-6">
+          <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-gray-600 mb-1">Total Views</p>
+                  <p
+                    class="text-3xl font-bold text-indigo-600"
+                    id="business-views"
+                  >
+                    0
+                  </p>
+                </div>
+                <i class="fas fa-eye text-indigo-100 text-3xl"></i>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-gray-600 mb-1">Sales</p>
+                  <p
+                    class="text-3xl font-bold text-green-600"
+                    id="business-sales"
+                  >
+                    0
+                  </p>
+                </div>
+                <i class="fas fa-chart-line text-green-100 text-3xl"></i>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-gray-600 mb-1">Rating</p>
+                  <p
+                    class="text-3xl font-bold text-yellow-600"
+                    id="business-rating"
+                  >
+                    0
+                  </p>
+                </div>
+                <i class="fas fa-star text-yellow-100 text-3xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Active Coupons</h3>
+            <div id="business-coupons-list" class="space-y-3">
+              <p class="text-gray-600">No active coupons. Create one!</p>
+            </div>
+          </div>
+        </div>
+        <!-- Coupon Maker Content -->
+        <div id="coupon-maker-content" class="hidden p-6">
+          <h2 class="text-2xl font-bold mb-6">Create Coupon</h2>
+          <form
+            onsubmit="createCoupon(event)"
+            class="bg-white p-6 rounded-xl shadow-md"
+          >
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block text-gray-700 mb-2">Coupon Code</label>
+                <input
+                  type="text"
+                  id="coupon-code"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="WELCOME10"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Expiration Date</label>
+                <input
+                  type="date"
+                  id="coupon-expires"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2"
+                >Discount Description</label
+              >
+              <textarea
+                id="coupon-discount"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="10% off your first purchase"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center space-x-2"
+            >
+              <i class="fas fa-plus mr-2"></i>
+              <span>Create Coupon</span>
+            </button>
+          </form>
+        </div>
+        <!-- Business Messages Content -->
+        <div id="business-messages-content" class="hidden p-6">
+          <h2 class="text-2xl font-bold mb-6">Messages</h2>
+          <div class="bg-white rounded-xl shadow-md h-96 flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+              <h3 class="font-semibold">Customer Inquiries</h3>
+            </div>
+            <div
+              id="business-messages-list"
+              class="flex-1 p-4 overflow-y-auto space-y-3"
+            >
+              <p class="text-gray-500 text-center mt-8">No messages yet</p>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex space-x-2">
+              <input
+                type="text"
+                id="business-message-input"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Type your response..."
+              />
+              <button
+                onclick="sendBusinessMessage()"
+                class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Business Account Content -->
+        <div id="business-account-content" class="hidden p-6">
+          <h2 class="text-2xl font-bold mb-6">Account Settings</h2>
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 mb-2">Business Name</label>
+                <input
+                  type="text"
+                  id="business-account-name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Business Type</label>
+                <input
+                  type="text"
+                  id="business-account-type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  id="business-account-location"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Subscription</label>
+                <div class="p-3 bg-green-50 rounded-lg">
+                  <p class="text-green-800 font-semibold">
+                    $2.99/month - Active
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Customer Dashboard -->
+      <div id="customer-dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- Customer Header -->
+        <header class="bg-white shadow-sm">
+          <div
+            class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-monkey text-white text-lg"></i>
+              </div>
+              <h1 class="text-xl font-bold text-gray-800">
+                Business<span class="text-amber-600">Monkey</span>
+              </h1>
+            </div>
+            <button
+              onclick="logout()"
+              class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+        <!-- Customer Navigation -->
+        <nav class="bg-white shadow-sm">
+          <div class="max-w-7xl mx-auto px-4">
+            <div class="flex space-x-8">
+              <button
+                onclick="showCatalog()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600"
+              >
+                <i class="fas fa-search mr-2"></i> Catalog
+              </button>
+              <button
+                onclick="showCustomerMessages()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <i class="fas fa-comment-dots mr-2"></i> Messages
+              </button>
+              <button
+                onclick="showCustomerAccount()"
+                class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              >
+                <i class="fas fa-user mr-2"></i> Account
+              </button>
+            </div>
+          </div>
+        </nav>
+        <!-- Catalog Content -->
+        <div id="catalog-content" class="p-4">
+          <div class="mb-6">
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+              <input
+                type="text"
+                id="search-input"
+                oninput="filterBusinesses()"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Search businesses..."
+              />
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                onclick="filterByType('')"
+                class="px-3 py-1 rounded-full text-sm bg-indigo-600 text-white"
+                id="all-types-btn"
+              >
+                All Types
+              </button>
+              <button
+                onclick="filterByType('Food & Beverage')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="food-btn"
+              >
+                Food & Beverage
+              </button>
+              <button
+                onclick="filterByType('Retail')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="retail-btn"
+              >
+                Retail
+              </button>
+              <button
+                onclick="filterByType('Services')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="services-btn"
+              >
+                Services
+              </button>
+              <button
+                onclick="filterByType('Beauty & Wellness')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="beauty-btn"
+              >
+                Beauty & Wellness
+              </button>
+              <button
+                onclick="filterByType('Home & Garden')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="home-btn"
+              >
+                Home & Garden
+              </button>
+              <button
+                onclick="filterByType('Arts & Crafts')"
+                class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
+                id="arts-btn"
+              >
+                Arts & Crafts
+              </button>
+            </div>
+          </div>
+          <div
+            id="businesses-grid"
+            class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            <!-- Business cards will be populated here -->
+          </div>
+        </div>
+        <!-- Customer Messages Content -->
+        <div id="customer-messages-content" class="hidden p-6">
+          <h2 class="text-2xl font-bold mb-6">Messages</h2>
+          <div class="bg-white rounded-xl shadow-md h-96 flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+              <h3 class="font-semibold" id="customer-chat-business-name">
+                Select a business to chat
+              </h3>
+            </div>
+            <div
+              id="customer-messages-list"
+              class="flex-1 p-4 overflow-y-auto space-y-3"
+            >
+              <p class="text-gray-500 text-center mt-8">
+                Select a business from the catalog to start chatting
+              </p>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex space-x-2">
+              <input
+                type="text"
+                id="customer-message-input"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Type your message..."
+                disabled
+              />
+              <button
+                onclick="sendCustomerMessage()"
+                class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                disabled
+              >
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold mb-3">Available Coupons</h3>
+            <div id="customer-coupons-list" class="space-y-2">
+              <p class="text-gray-600">
+                Select a business to see their coupons
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Customer Account Content -->
+        <div id="customer-account-content" class="hidden p-6">
+          <h2 class="text-2xl font-bold mb-6">Account Settings</h2>
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  id="customer-account-email"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2">Account Type</label>
+                <input
+                  type="text"
+                  value="Customer (Free)"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Global state
+      let currentUser = null;
+      let currentBusiness = null;
+      let selectedBusinessId = null;
+      let businesses = [
+        {
+          id: 1,
+          name: "Bella Bakery",
+          type: "Food & Beverage",
+          description: "Artisanal bread and pastries made with love",
+          location: "Downtown",
+          rating: 4.8,
+          views: 1250,
+          sales: 89,
+          coupons: [
+            {
+              id: 1,
+              code: "WELCOME10",
+              discount: "10% off",
+              expires: "2026-01-31",
+            },
+            {
+              id: 2,
+              code: "FREESHIP",
+              discount: "Free delivery",
+              expires: "2026-02-15",
+            },
+          ],
+          messages: [],
+        },
+        {
+          id: 2,
+          name: "Urban Threads",
+          type: "Retail",
+          description: "Sustainable fashion for the modern woman",
+          location: "Westside Mall",
+          rating: 4.6,
+          views: 980,
+          sales: 156,
+          coupons: [
+            {
+              id: 3,
+              code: "NEWCUST15",
+              discount: "15% off first purchase",
+              expires: "2026-03-01",
+            },
+          ],
+          messages: [],
+        },
+        {
+          id: 3,
+          name: "Tech Fix Pro",
+          type: "Services",
+          description: "Fast and reliable tech repair services",
+          location: "North District",
+          rating: 4.9,
+          views: 2100,
+          sales: 342,
+          coupons: [],
+          messages: [],
+        },
+      ];
+      let currentFilterType = "";
+      let currentSearchTerm = "";
+      // Show/hide functions for main pages
+      function showLanding() {
+        document.getElementById("landing-page").classList.remove("hidden");
+        document.getElementById("how-it-works-page").classList.add("hidden");
+        document.getElementById("about-page").classList.add("hidden");
+        document.getElementById("contact-page").classList.add("hidden");
+        document.getElementById("login-modal").classList.add("hidden");
+        document.getElementById("signup-person-modal").classList.add("hidden");
+        document
+          .getElementById("signup-business-modal")
+          .classList.add("hidden");
+        document.getElementById("business-dashboard").classList.add("hidden");
+        document.getElementById("customer-dashboard").classList.add("hidden");
+      }
+      function showHowItWorks() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document.getElementById("how-it-works-page").classList.remove("hidden");
+        document.getElementById("about-page").classList.add("hidden");
+        document.getElementById("contact-page").classList.add("hidden");
+      }
+      function showAbout() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document.getElementById("how-it-works-page").classList.add("hidden");
+        document.getElementById("about-page").classList.remove("hidden");
+        document.getElementById("contact-page").classList.add("hidden");
+      }
+      function showContact() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document.getElementById("how-it-works-page").classList.add("hidden");
+        document.getElementById("about-page").classList.add("hidden");
+        document.getElementById("contact-page").classList.remove("hidden");
+      }
+      function showLogin() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document.getElementById("login-modal").classList.remove("hidden");
+      }
+      function showSignupPerson() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document
+          .getElementById("signup-person-modal")
+          .classList.remove("hidden");
+      }
+      function showSignupBusiness() {
+        document.getElementById("landing-page").classList.add("hidden");
+        document
+          .getElementById("signup-business-modal")
+          .classList.remove("hidden");
+      }
+      function showBusinessDashboard() {
+        document
+          .getElementById("business-dashboard")
+          .classList.remove("hidden");
+        document
+          .getElementById("business-home-content")
+          .classList.remove("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        updateBusinessDashboard();
+      }
+      function showCustomerDashboard() {
+        document
+          .getElementById("customer-dashboard")
+          .classList.remove("hidden");
+        document.getElementById("catalog-content").classList.remove("hidden");
+        document
+          .getElementById("customer-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("customer-account-content")
+          .classList.add("hidden");
+        renderBusinesses();
+      }
+      function showBusinessHome() {
+        document
+          .getElementById("business-home-content")
+          .classList.remove("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        updateBusinessDashboard();
+      }
+      function showCouponMaker() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document
+          .getElementById("coupon-maker-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+      }
+      function showBusinessMessages() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        renderBusinessMessages();
+      }
+      function showBusinessAccount() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.remove("hidden");
+        renderBusinessAccount();
+      }
+      function showCatalog() {
+        document.getElementById("catalog-content").classList.remove("hidden");
+        document
+          .getElementById("customer-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("customer-account-content")
+          .classList.add("hidden");
+        renderBusinesses();
+      }
+      function showCustomerMessages() {
+        document.getElementById("catalog-content").classList.add("hidden");
+        document
+          .getElementById("customer-messages-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("customer-account-content")
+          .classList.add("hidden");
+        renderCustomerMessages();
+      }
+      function showCustomerAccount() {
+        document.getElementById("catalog-content").classList.add("hidden");
+        document
+          .getElementById("customer-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("customer-account-content")
+          .classList.remove("hidden");
+        document.getElementById("customer-account-email").value =
+          currentUser.email;
+      }
+      // Contact form handler
+      function handleContactForm(e) {
+        e.preventDefault();
+        const name = document.getElementById("contact-name").value;
+        const email = document.getElementById("contact-email").value;
+        const subject = document.getElementById("contact-subject").value;
+        const message = document.getElementById("contact-message").value;
+        // In a real app, you would send this to a server
+        alert("Thank you for your message! We'll get back to you soon.");
+        document.getElementById("contact-name").value = "";
+        document.getElementById("contact-email").value = "";
+        document.getElementById("contact-subject").value = "";
+        document.getElementById("contact-message").value = "";
+      }
+      // Authentication functions
+      function handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+        const userType = document.querySelector(
+          'input[name="user-type"]:checked'
+        ).value;
+        if (email && password) {
+          currentUser = { email, userType, id: Date.now() };
+          if (userType === "business") {
+            // Find or create business
+            currentBusiness = businesses[0] || businesses[0]; // Default to first business for demo
+            showBusinessDashboard();
+          } else {
+            showCustomerDashboard();
+          }
+        }
+      }
+      function handleSignupPerson(e) {
+        e.preventDefault();
+        const email = document.getElementById("person-email").value;
+        const password = document.getElementById("person-password").value;
+        if (email && password) {
+          currentUser = { email, userType: "person", id: Date.now() };
+          showCustomerDashboard();
+        }
+      }
+      function handleSignupBusiness(e) {
+        e.preventDefault();
+        const businessName = document.getElementById("business-name").value;
+        const businessType = document.getElementById("business-type").value;
+        const businessLocation =
+          document.getElementById("business-location").value;
+        const email = document.getElementById("business-email").value;
+        const password = document.getElementById("business-password").value;
+        if (
+          businessName &&
+          businessType &&
+          businessLocation &&
+          email &&
+          password
+        ) {
+          const newBusiness = {
+            id: Date.now(),
+            name: businessName,
+            type: businessType,
+            description: "New business on BusinessMonkey",
+            location: businessLocation,
+            rating: 0,
+            views: 0,
+            sales: 0,
+            coupons: [],
+            messages: [],
+          };
+          businesses.push(newBusiness);
+          currentUser = { email, userType: "business", id: Date.now() };
+          currentBusiness = newBusiness;
+          showBusinessDashboard();
+        }
+      }
+      function logout() {
+        currentUser = null;
+        currentBusiness = null;
+        selectedBusinessId = null;
+        showLanding();
+      }
+      // Business dashboard functions
+      function updateBusinessDashboard() {
+        if (!currentBusiness) return;
+        document.getElementById("business-views").textContent =
+          currentBusiness.views;
+        document.getElementById("business-sales").textContent =
+          currentBusiness.sales;
+        document.getElementById("business-rating").textContent =
+          currentBusiness.rating;
+        const couponsList = document.getElementById("business-coupons-list");
+        if (currentBusiness.coupons.length === 0) {
+          couponsList.innerHTML =
+            '<p class="text-gray-600">No active coupons. Create one!</p>';
+        } else {
+          couponsList.innerHTML = currentBusiness.coupons
+            .map(
+              (coupon) => `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-semibold">${coupon.code}</p>
+                            <p class="text-gray-600">${coupon.discount}</p>
+                        </div>
+                        <p class="text-sm text-gray-500">Expires: ${coupon.expires}</p>
+                    </div>
+                `
+            )
+            .join("");
+        }
+      }
+      function renderBusinessAccount() {
+        if (!currentBusiness) return;
+        document.getElementById("business-account-name").value =
+          currentBusiness.name;
+        document.getElementById("business-account-type").value =
+          currentBusiness.type;
+        document.getElementById("business-account-location").value =
+          currentBusiness.location;
+      }
+      function createCoupon(e) {
+        e.preventDefault();
+        if (!currentBusiness) return;
+        const code = document.getElementById("coupon-code").value;
+        const discount = document.getElementById("coupon-discount").value;
+        const expires = document.getElementById("coupon-expires").value;
+        if (code && discount && expires) {
+          currentBusiness.coupons.push({
+            id: Date.now(),
+            code: code,
+            discount: discount,
+            expires: expires,
+          });
+          // Clear form
+          document.getElementById("coupon-code").value = "";
+          document.getElementById("coupon-discount").value = "";
+          document.getElementById("coupon-expires").value = "";
+          updateBusinessDashboard();
+        }
+      }
+      function renderBusinessMessages() {
+        if (!currentBusiness) return;
+        const messagesList = document.getElementById("business-messages-list");
+        if (currentBusiness.messages.length === 0) {
+          messagesList.innerHTML =
+            '<p class="text-gray-500 text-center mt-8">No messages yet</p>';
+        } else {
+          messagesList.innerHTML = currentBusiness.messages
+            .map(
+              (msg) => `
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-gray-800">${msg.text}</p>
+                        <p class="text-xs text-gray-500 mt-1">${new Date(
+                          msg.timestamp
+                        ).toLocaleTimeString()}</p>
+                    </div>
+                `
+            )
+            .join("");
+        }
+      }
+      function sendBusinessMessage() {
+        const messageInput = document.getElementById("business-message-input");
+        const message = messageInput.value.trim();
+        if (message && currentBusiness) {
+          currentBusiness.messages.push({
+            id: Date.now(),
+            text: message,
+            sender: "business",
+            timestamp: new Date(),
+          });
+          messageInput.value = "";
+          renderBusinessMessages();
+        }
+      }
+      // Customer functions
+      function renderBusinesses() {
+        let filtered = businesses;
+        if (currentSearchTerm) {
+          filtered = filtered.filter(
+            (business) =>
+              business.name
+                .toLowerCase()
+                .includes(currentSearchTerm.toLowerCase()) ||
+              business.description
+                .toLowerCase()
+                .includes(currentSearchTerm.toLowerCase())
+          );
+        }
+        if (currentFilterType) {
+          filtered = filtered.filter(
+            (business) => business.type === currentFilterType
+          );
+        }
+        const grid = document.getElementById("businesses-grid");
+        grid.innerHTML = filtered
+          .map(
+            (business) => `
+                <div class="bg-white rounded-xl shadow-md overflow-hidden business-card hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-gray-800">${
+                              business.name
+                            }</h3>
+                            <div class="flex items-center bg-yellow-100 px-2 py-1 rounded">
+                                <i class="fas fa-star text-yellow-600 mr-1"></i>
+                                <span class="text-sm font-semibold text-yellow-800">${
+                                  business.rating
+                                }</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-3">${
+                          business.description
+                        }</p>
+                        <div class="flex items-center text-gray-500 mb-4">
+                            <i class="fas fa-map-marker-alt mr-1 text-sm"></i>
+                            <span class="text-sm">${business.location}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                                ${business.type}
+                            </span>
+                            ${
+                              business.coupons.length > 0
+                                ? `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                    ${business.coupons.length} coupon${
+                                    business.coupons.length !== 1 ? "s" : ""
+                                  }
+                                </span>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                        <button onclick="startChat(${
+                          business.id
+                        })" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>Contact</span>
+                        </button>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+      function filterBusinesses() {
+        currentSearchTerm = document.getElementById("search-input").value;
+        renderBusinesses();
+      }
+      function filterByType(type) {
+        currentFilterType = type;
+        // Update button styles
+        document.querySelectorAll("#catalog-content button").forEach((btn) => {
+          btn.classList.remove("bg-indigo-600", "text-white");
+          btn.classList.add("bg-gray-200", "text-gray-700");
+        });
+        if (type === "") {
+          document
+            .getElementById("all-types-btn")
+            .classList.remove("bg-gray-200", "text-gray-700");
+          document
+            .getElementById("all-types-btn")
+            .classList.add("bg-indigo-600", "text-white");
+        } else {
+          const btnId = type.replace(/ & /g, "-").toLowerCase() + "-btn";
+          document
+            .getElementById(btnId)
+            .classList.remove("bg-gray-200", "text-gray-700");
+          document
+            .getElementById(btnId)
+            .classList.add("bg-indigo-600", "text-white");
+        }
+        renderBusinesses();
+      }
+      function startChat(businessId) {
+        selectedBusinessId = businessId;
+        showCustomerMessages();
+      }
+      function renderCustomerMessages() {
+        if (!selectedBusinessId) {
+          document.getElementById("customer-chat-business-name").textContent =
+            "Select a business to chat";
+          document.getElementById("customer-coupons-list").innerHTML =
+            '<p class="text-gray-600">Select a business to see their coupons</p>';
+          document.getElementById("customer-message-input").disabled = true;
+          document.querySelector(
+            "#customer-messages-content button"
+          ).disabled = true;
+          return;
+        }
+        const business = businesses.find((b) => b.id === selectedBusinessId);
+        if (!business) return;
+        document.getElementById("customer-chat-business-name").textContent =
+          business.name;
+        // Render messages
+        const messagesList = document.getElementById("customer-messages-list");
+        const userMessages = business.messages.filter(
+          (msg) => msg.sender === "user"
+        );
+        if (userMessages.length === 0) {
+          messagesList.innerHTML =
+            '<p class="text-gray-500 text-center mt-8">Start a conversation with this business</p>';
+        } else {
+          messagesList.innerHTML = userMessages
+            .map(
+              (msg) => `
+                    <div class="bg-indigo-100 p-3 rounded-lg ml-auto max-w-xs">
+                        <p class="text-gray-800">${msg.text}</p>
+                        <p class="text-xs text-gray-600 mt-1">${new Date(
+                          msg.timestamp
+                        ).toLocaleTimeString()}</p>
+                    </div>
+                `
+            )
+            .join("");
+        }
+        // Render coupons
+        const couponsList = document.getElementById("customer-coupons-list");
+        if (business.coupons.length === 0) {
+          couponsList.innerHTML =
+            '<p class="text-gray-600">No coupons available</p>';
+        } else {
+          couponsList.innerHTML = business.coupons
+            .map(
+              (coupon) => `
+                    <div class="bg-green-50 p-3 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-green-800">${coupon.code}</p>
+                                <p class="text-green-700">${coupon.discount}</p>
+                            </div>
+                            <p class="text-sm text-green-600">Expires: ${coupon.expires}</p>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+        }
+        // Enable messaging
+        document.getElementById("customer-message-input").disabled = false;
+        document.querySelector(
+          "#customer-messages-content button"
+        ).disabled = false;
+      }
+      function sendCustomerMessage() {
+        if (!selectedBusinessId) return;
+        const messageInput = document.getElementById("customer-message-input");
+        const message = messageInput.value.trim();
+        if (message) {
+          const business = businesses.find((b) => b.id === selectedBusinessId);
+          if (business) {
+            business.messages.push({
+              id: Date.now(),
+              text: message,
+              sender: "user",
+              timestamp: new Date(),
+            });
+            messageInput.value = "";
+            renderCustomerMessages();
+          }
+        }
+      }
+      // Initialize
+      showLanding();
+    </script>
+  </body>
+</html>
