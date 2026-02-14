@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LocalBoost - Support Small Businesses</title>
+    <title>BusinessMonkey - Business Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -14,741 +14,760 @@
         theme: {
           extend: {
             colors: {
-              purple: {
-                50: "#f5f3ff",
-                100: "#ede9fe",
-                200: "#ddd6fe",
-                300: "#c4b5fd",
-                400: "#a78bfa",
-                500: "#8b5cf6",
-                600: "#7c3aed",
-                700: "#6d28d9",
-                800: "#5b21b6",
-                900: "#4c1d95",
-              },
+              primary: "#4f46e5",
+              secondary: "#6366f1",
+              accent: "#f59e0b",
             },
           },
         },
       };
     </script>
     <style>
-      .eye-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+      .business-card:hover {
+        transform: translateY(-5px);
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .stats-card {
+        transition: all 0.3s ease;
+      }
+      .stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        height: 150px;
+        gap: 6px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin-top: 0.5rem;
+      }
+      .bar {
+        flex: 1;
+        background: linear-gradient(to top, #e5e7eb, #f3f4f6);
+        border-radius: 4px 4px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        min-height: 4px;
+      }
+      .bar-label {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.65rem;
+        color: #6b7280;
+      }
+      .toggle-bg {
+        background-color: #d1d5db;
+      }
+      .toggle-circle {
+        background-color: white;
+      }
+      .toggle-active .toggle-bg {
+        background-color: #4f46e5;
+      }
+      .toggle-active .toggle-circle {
+        transform: translateX(100%);
+        background-color: white;
+      }
+      .chat-bubble {
+        max-width: 70%;
+        padding: 8px 12px;
+        border-radius: 18px;
+        margin-bottom: 10px;
+        position: relative;
+        line-height: 1.4;
+        font-size: 0.9rem;
+      }
+      .chat-bubble.business {
+        background-color: #4f46e5;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+      .chat-bubble.customer {
+        background-color: #f3f4f6;
+        color: #374151;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+      }
+      .chat-contact.active {
+        background-color: #4f46e5;
+        color: white;
+      }
+      .chat-contact:hover:not(.active) {
+        background-color: #f3f4f6;
+      }
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+        color: #6b7280;
+      }
+      .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.5;
+      }
+      .chat-container {
+        height: calc(100vh - 240px);
+      }
+      @media (max-width: 768px) {
+        .chat-container {
+          height: calc(100vh - 280px);
+        }
       }
     </style>
   </head>
-  <body class="bg-gray-50">
-    <div id="app" class="min-h-screen">
-      <!-- Landing Page -->
-      <div
-        id="landing-page"
-        class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50"
-      >
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-              <h1 class="text-2xl font-bold text-purple-600">LocalBoost</h1>
-              <nav class="flex space-x-6">
-                <button
-                  onclick="showBusinessSignup()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Business Signup
-                </button>
-                <button
-                  onclick="showCustomerSignup()"
-                  class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors"
-                >
-                  Customer Signup
-                </button>
-              </nav>
-            </div>
-          </div>
-        </header>
-
-        <!-- Hero Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div class="text-center">
-            <h2 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Support Your Local
-              <span class="text-purple-600">Small Businesses</span>
-            </h2>
-            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Discover amazing local businesses in your area, connect directly
-              with owners, and enjoy exclusive deals and discounts.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onclick="showBusinessSignup()"
-                class="bg-purple-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-colors"
-              >
-                Join as Business ($2.99/month)
-              </button>
-              <button
-                onclick="showCustomerSignup()"
-                class="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-purple-50 transition-colors"
-              >
-                Join as Customer (Free)
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Features Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div class="grid md:grid-cols-2 gap-12">
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-              <h3 class="text-2xl font-bold text-gray-900 mb-4">
-                For Business Owners
-              </h3>
-              <ul class="space-y-3 text-gray-600">
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Showcase your business to local customers
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Create and manage exclusive coupons and discounts
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Direct messaging with potential customers
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Track your business performance and analytics
-                </li>
-              </ul>
-            </div>
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-              <h3 class="text-2xl font-bold text-gray-900 mb-4">
-                For Customers
-              </h3>
-              <ul class="space-y-3 text-gray-600">
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Discover local businesses near you
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Access exclusive deals and promotions
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Direct communication with business owners
-                </li>
-                <li class="flex items-center">
-                  <div class="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-                  Support your local economy and community
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Business Signup -->
-      <div
-        id="business-signup"
-        class="hidden min-h-screen bg-gray-50 flex items-center justify-center p-4"
-      >
-        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-          <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
-              Business Signup
-            </h2>
-            <p class="text-gray-600">Join LocalBoost for $2.99/month</p>
-          </div>
-          <form onsubmit="handleBusinessSignup(event)" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Business Name</label
-              >
-              <input
-                type="text"
-                id="business-name"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Email</label
-              >
-              <input
-                type="email"
-                id="business-email"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Business Type</label
-              >
-              <select
-                id="business-type"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select a business type</option>
-                <option value="Food & Beverage">Food & Beverage</option>
-                <option value="Retail">Retail</option>
-                <option value="Services">Services</option>
-                <option value="Health & Wellness">Health & Wellness</option>
-                <option value="Arts & Crafts">Arts & Crafts</option>
-                <option value="Professional Services">
-                  Professional Services
-                </option>
-                <option value="Automotive">Automotive</option>
-                <option value="Home & Garden">Home & Garden</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Description</label
-              >
-              <textarea
-                id="business-description"
-                required
-                rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Sign Up for $2.99/month
-            </button>
-            <button
-              type="button"
-              onclick="showLanding()"
-              class="w-full text-purple-600 py-2 rounded-lg border border-purple-600 hover:bg-purple-50 transition-colors"
-            >
-              Back to Home
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Customer Signup -->
-      <div
-        id="customer-signup"
-        class="hidden min-h-screen bg-gray-50 flex items-center justify-center p-4"
-      >
-        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-          <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
-              Customer Signup
-            </h2>
-            <p class="text-gray-600">It's completely free!</p>
-          </div>
-          <form onsubmit="handleCustomerSignup(event)" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Full Name</label
-              >
-              <input
-                type="text"
-                id="customer-name"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Email</label
-              >
-              <input
-                type="email"
-                id="customer-email"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Sign Up Free
-            </button>
-            <button
-              type="button"
-              onclick="showLanding()"
-              class="w-full text-purple-600 py-2 rounded-lg border border-purple-600 hover:bg-purple-50 transition-colors"
-            >
-              Back to Home
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Business Dashboard -->
-      <div id="business-dashboard" class="hidden min-h-screen bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-8">
-              <button
-                onclick="showBusinessView('home')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-purple-500 text-purple-600"
-              >
-                home
-              </button>
-              <button
-                onclick="showBusinessView('coupons')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                coupons
-              </button>
-              <button
-                onclick="showBusinessView('messages')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                messages
-              </button>
-              <button
-                onclick="showBusinessView('account')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                account
-              </button>
-              <button
-                onclick="logout()"
-                class="ml-auto py-2 px-4 text-red-600 hover:text-red-800 flex items-center"
-              >
-                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-              </button>
-            </div>
-          </div>
-        </nav>
-
-        <!-- Content -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <!-- Home View -->
-          <div id="business-home" class="block">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div class="bg-white p-6 rounded-lg shadow">
-                <div class="flex items-center">
-                  <div class="p-3 bg-blue-100 rounded-lg">
-                    <svg
-                      class="eye-icon text-blue-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  </div>
-                  <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Views</p>
-                    <p class="text-2xl font-bold text-gray-900">1,247</p>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-white p-6 rounded-lg shadow">
-                <div class="flex items-center">
-                  <div class="p-3 bg-green-100 rounded-lg">
-                    <i class="fas fa-dollar-sign text-green-600 w-6 h-6"></i>
-                  </div>
-                  <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">
-                      Sales Generated
-                    </p>
-                    <p class="text-2xl font-bold text-gray-900">$2,847</p>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-white p-6 rounded-lg shadow">
-                <div class="flex items-center">
-                  <div class="p-3 bg-purple-100 rounded-lg">
-                    <i class="fas fa-comment-dots text-purple-600 w-6 h-6"></i>
-                  </div>
-                  <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Messages</p>
-                    <p class="text-2xl font-bold text-gray-900">24</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-8 bg-white p-6 rounded-lg shadow">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Your Business Profile
-              </h3>
-              <div class="space-y-2 text-gray-600">
-                <p>
-                  <strong>Business Name:</strong>
-                  <span id="display-business-name">Bella's Bakery</span>
-                </p>
-                <p>
-                  <strong>Type:</strong>
-                  <span id="display-business-type">Food & Beverage</span>
-                </p>
-                <p>
-                  <strong>Description:</strong>
-                  <span id="display-business-description"
-                    >Artisanal breads and pastries made fresh daily</span
-                  >
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Coupons View -->
-          <div id="business-coupons" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-bold text-gray-900">Manage Coupons</h2>
-              <div class="flex space-x-2">
-                <input
-                  type="text"
-                  id="new-coupon"
-                  placeholder="Enter coupon description..."
-                  class="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                <button
-                  onclick="addCoupon()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition-colors"
-                >
-                  <i class="fas fa-plus"></i>
-                </button>
-              </div>
-            </div>
-
-            <div id="coupons-list" class="space-y-4">
-              <div class="bg-white p-8 rounded-lg shadow text-center">
-                <p class="text-gray-500">
-                  No coupons created yet. Add your first coupon above!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Messages View -->
-          <div id="business-messages" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Messages</h2>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-              <div class="p-4 border-b">
-                <h3 class="font-semibold">Customer Inquiries</h3>
-              </div>
-              <div
-                id="business-messages-container"
-                class="h-96 overflow-y-auto p-4 space-y-4"
-              >
-                <div class="text-center text-gray-500 py-8">
-                  No messages yet. Customers will be able to contact you once
-                  they find your business!
-                </div>
-              </div>
-              <div class="p-4 border-t flex">
-                <input
-                  type="text"
-                  id="business-message-input"
-                  placeholder="Type your message..."
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                <button
-                  onclick="sendBusinessMessage()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition-colors"
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Account View -->
-          <div id="business-account" class="hidden max-w-2xl">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">
-              Account Settings
-            </h2>
-            <div class="bg-white p-6 rounded-lg shadow">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Business Name</label
-                  >
-                  <input
-                    type="text"
-                    id="account-business-name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Email</label
-                  >
-                  <input
-                    type="email"
-                    id="account-business-email"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Business Type</label
-                  >
-                  <select
-                    id="account-business-type"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="">Select a business type</option>
-                    <option value="Food & Beverage">Food & Beverage</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Services">Services</option>
-                    <option value="Health & Wellness">Health & Wellness</option>
-                    <option value="Arts & Crafts">Arts & Crafts</option>
-                    <option value="Professional Services">
-                      Professional Services
-                    </option>
-                    <option value="Automotive">Automotive</option>
-                    <option value="Home & Garden">Home & Garden</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Description</label
-                  >
-                  <textarea
-                    id="account-business-description"
-                    rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  ></textarea>
-                </div>
-                <button
-                  onclick="saveBusinessAccount()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Customer Dashboard -->
-      <div id="customer-dashboard" class="hidden min-h-screen bg-gray-50">
-        <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-8">
-              <button
-                onclick="showCustomerView('catalog')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-purple-500 text-purple-600"
-              >
-                catalog
-              </button>
-              <button
-                onclick="showCustomerView('messages')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                messages
-              </button>
-              <button
-                onclick="showCustomerView('account')"
-                class="py-4 px-2 border-b-2 font-medium text-sm capitalize border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              >
-                account
-              </button>
-              <button
-                onclick="logout()"
-                class="ml-auto py-2 px-4 text-red-600 hover:text-red-800 flex items-center"
-              >
-                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-              </button>
-            </div>
-          </div>
-        </nav>
-
-        <!-- Content -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <!-- Catalog View -->
-          <div id="customer-catalog" class="block">
-            <div class="mb-6">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                Discover Local Businesses
-              </h2>
-              <div class="flex flex-col sm:flex-row gap-4">
-                <div class="flex-1 relative">
-                  <i
-                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  ></i>
-                  <input
-                    type="text"
-                    id="search-input"
-                    placeholder="Search businesses..."
-                    oninput="filterBusinesses()"
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <select
-                  id="type-filter"
-                  onchange="filterBusinesses()"
-                  class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="All">All Types</option>
-                  <option value="Food & Beverage">Food & Beverage</option>
-                  <option value="Retail">Retail</option>
-                  <option value="Services">Services</option>
-                  <option value="Health & Wellness">Health & Wellness</option>
-                  <option value="Arts & Crafts">Arts & Crafts</option>
-                  <option value="Professional Services">
-                    Professional Services
-                  </option>
-                  <option value="Automotive">Automotive</option>
-                  <option value="Home & Garden">Home & Garden</option>
-                </select>
-              </div>
-            </div>
-
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Business Dashboard -->
+    <div id="business-dashboard" class="min-h-screen flex flex-col">
+      <!-- Business Header -->
+      <header class="bg-white shadow-sm">
+        <div
+          class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center"
+        >
+          <div class="flex items-center space-x-3">
             <div
-              id="businesses-grid"
-              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
             >
-              <!-- Business cards will be inserted here by JavaScript -->
+              <i class="fas fa-monkey text-white text-lg"></i>
             </div>
+            <h1 class="text-xl font-bold text-gray-800">
+              Business<span class="text-amber-600">Monkey</span> Dashboard
+            </h1>
           </div>
+          <button
+            onclick="logout()"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+          </button>
+        </div>
+      </header>
 
-          <!-- Business Detail View -->
-          <div id="business-detail" class="hidden">
+      <!-- Business Navigation -->
+      <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex space-x-8 border-b border-gray-200">
             <button
-              onclick="showCustomerView('catalog')"
-              class="text-purple-600 hover:text-purple-800 mb-4 flex items-center"
+              onclick="showBusinessHome()"
+              id="tab-dashboard"
+              class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 flex items-center"
             >
-              <span class="mr-2">←</span> Back to Catalog
+              <i class="fas fa-home mr-2"></i> Dashboard
             </button>
+            <button
+              onclick="showCouponMaker()"
+              id="tab-coupons"
+              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
+            >
+              <i class="fas fa-tags mr-2"></i> Coupons
+            </button>
+            <button
+              onclick="showBusinessMessages()"
+              id="tab-messages"
+              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
+            >
+              <i class="fas fa-comment-dots mr-2"></i> Messages
+            </button>
+            <button
+              onclick="showBusinessAccount()"
+              id="tab-settings"
+              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
+            >
+              <i class="fas fa-cog mr-2"></i> Settings
+            </button>
+          </div>
+        </div>
+      </nav>
 
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-              <img
-                id="detail-image"
-                src=""
-                alt=""
-                class="w-full h-64 object-cover"
-              />
-              <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
+      <!-- Main Content Area -->
+      <div class="flex-1 overflow-auto">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+          <!-- Business Home Content (Dashboard) -->
+          <div id="business-home-content">
+            <h2 class="text-xl font-bold mb-4">Business Analytics</h2>
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-white p-4 rounded-xl shadow-md stats-card">
+                <div class="flex items-center justify-between">
                   <div>
-                    <h2
-                      id="detail-name"
-                      class="text-2xl font-bold text-gray-900"
-                    ></h2>
-                    <div class="flex items-center mt-1">
-                      <div
-                        class="flex items-center bg-yellow-100 px-2 py-1 rounded mr-3"
+                    <p class="text-gray-600 mb-1 text-sm">Total Views</p>
+                    <p class="text-2xl font-bold text-indigo-600">0</p>
+                    <p class="text-gray-500 text-xs mt-1">No views yet</p>
+                  </div>
+                  <i class="fas fa-eye text-indigo-100 text-2xl"></i>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-xl shadow-md stats-card">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-600 mb-1 text-sm">Total Sales</p>
+                    <p class="text-2xl font-bold text-green-600">$0</p>
+                    <p class="text-gray-500 text-xs mt-1">No sales recorded</p>
+                  </div>
+                  <i class="fas fa-chart-line text-green-100 text-2xl"></i>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-xl shadow-md stats-card">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-gray-600 mb-1 text-sm">Customer Rating</p>
+                    <p class="text-2xl font-bold text-yellow-600">0.0/5.0</p>
+                    <p class="text-gray-500 text-xs mt-1">0 reviews</p>
+                  </div>
+                  <i class="fas fa-star text-yellow-100 text-2xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+              <!-- Sales Chart -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">
+                  Weekly Sales Performance
+                </h3>
+                <div class="bar-chart">
+                  <div class="bar" style="height: 0%" title="Monday: $0">
+                    <div class="bar-label">Mon</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Tuesday: $0">
+                    <div class="bar-label">Tue</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Wednesday: $0">
+                    <div class="bar-label">Wed</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Thursday: $0">
+                    <div class="bar-label">Thu</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Friday: $0">
+                    <div class="bar-label">Fri</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Saturday: $0">
+                    <div class="bar-label">Sat</div>
+                  </div>
+                  <div class="bar" style="height: 0%" title="Sunday: $0">
+                    <div class="bar-label">Sun</div>
+                  </div>
+                </div>
+                <div class="mt-3 flex justify-between text-xs text-gray-600">
+                  <span
+                    ><i class="fas fa-circle text-gray-400 mr-1"></i> Sales
+                    ($)</span
+                  >
+                  <span>Total: $0</span>
+                </div>
+                <div class="mt-3 text-center text-gray-500 text-xs">
+                  No sales data available yet
+                </div>
+              </div>
+
+              <!-- Customer Demographics -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">
+                  Customer Demographics
+                </h3>
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="text-gray-700 text-xs"
+                        >Returning Customers</span
                       >
-                        <i class="fas fa-star text-yellow-600 mr-1"></i>
-                        <span
-                          id="detail-rating"
-                          class="text-sm font-medium text-yellow-800"
-                        ></span>
+                      <span class="font-semibold text-xs">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-indigo-600 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="text-gray-700 text-xs">New Customers</span>
+                      <span class="font-semibold text-xs">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-amber-500 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <h4 class="font-semibold text-sm mb-2">
+                      Top Customer Locations
+                    </h4>
+                    <div class="text-center py-4 text-gray-500 text-xs">
+                      No location data available
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+              <h3 class="text-lg font-semibold p-4 pb-3">Recent Activity</h3>
+              <div class="divide-y divide-gray-200 max-h-80 overflow-y-auto">
+                <div class="empty-state py-6">
+                  <i class="fas fa-history"></i>
+                  <p class="text-base font-medium">No recent activity</p>
+                  <p class="mt-1 text-sm">
+                    Your business activity will appear here once you start
+                    receiving orders, messages, and reviews
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coupon Maker Content -->
+          <div id="coupon-maker-content" class="hidden">
+            <h2 class="text-xl font-bold mb-4">Manage Coupons</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Create Coupon Form -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">Create New Coupon</h3>
+                <form onsubmit="createCoupon(event)">
+                  <div class="mb-3">
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Coupon Code</label
+                    >
+                    <input
+                      type="text"
+                      id="coupon-code"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="WELCOME10"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Discount Description</label
+                    >
+                    <textarea
+                      id="coupon-discount"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="10% off your first purchase"
+                      rows="2"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="mb-4">
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Expiration Date</label
+                    >
+                    <input
+                      type="date"
+                      id="coupon-expires"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center space-x-2 font-medium text-sm"
+                  >
+                    <i class="fas fa-plus mr-1"></i>
+                    <span>Create Coupon</span>
+                  </button>
+                </form>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <h4 class="font-semibold text-blue-800 mb-1 text-xs">
+                    Coupon Tips
+                  </h4>
+                  <ul class="text-blue-700 space-y-0.5 text-xs">
+                    <li>
+                      <i class="fas fa-check-circle text-green-500 mr-1"></i
+                      >Create urgency with limited-time offers
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-green-500 mr-1"></i>Use
+                      clear, benefit-focused descriptions
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-green-500 mr-1"></i
+                      >Track redemption rates in your analytics
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Active Coupons List -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">Active Coupons</h3>
+                <div
+                  id="business-coupons-list"
+                  class="space-y-2 max-h-80 overflow-y-auto"
+                >
+                  <div class="empty-state py-8">
+                    <i class="fas fa-tag"></i>
+                    <p class="text-base font-medium">No active coupons</p>
+                    <p class="mt-1 text-sm">
+                      Create your first coupon to attract new customers and
+                      reward loyal ones
+                    </p>
+                    <button
+                      onclick="document.getElementById('coupon-code').focus()"
+                      class="mt-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors text-xs"
+                    >
+                      Create Your First Coupon
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Messages Content -->
+          <div id="business-messages-content" class="hidden">
+            <h2 class="text-xl font-bold mb-4">Messages</h2>
+            <div
+              class="bg-white rounded-xl shadow-md overflow-hidden chat-container"
+            >
+              <div class="grid md:grid-cols-3 h-full">
+                <!-- Conversations List -->
+                <div class="border-r border-gray-200 overflow-y-auto">
+                  <div class="p-3 border-b border-gray-200">
+                    <h3 class="font-semibold text-sm">Conversations</h3>
+                  </div>
+                  <div id="conversations-list" class="empty-state py-8">
+                    <i class="fas fa-comments"></i>
+                    <p class="text-base font-medium">No conversations yet</p>
+                    <p class="mt-1 text-sm">
+                      Conversations with customers and other businesses will
+                      appear here
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="md:col-span-2 flex flex-col">
+                  <div class="p-3 border-b border-gray-200">
+                    <h3 class="font-semibold text-sm">Messages</h3>
+                  </div>
+                  <div
+                    id="chat-messages"
+                    class="flex-1 p-3 overflow-y-auto flex items-center justify-center bg-gray-50"
+                  >
+                    <div class="text-center text-gray-500">
+                      <i
+                        class="fas fa-comment-dots text-3xl mb-3 opacity-50"
+                      ></i>
+                      <p class="text-base font-medium">
+                        No conversation selected
+                      </p>
+                      <p class="mt-1 text-sm">
+                        Select a conversation from the list to start chatting
+                      </p>
+                    </div>
+                  </div>
+                  <div class="p-3 border-t border-gray-200">
+                    <div class="flex space-x-2">
+                      <input
+                        type="text"
+                        id="business-message-input"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-sm"
+                        placeholder="Select a conversation to start messaging..."
+                        disabled
+                      />
+                      <button
+                        class="bg-gray-400 text-white p-2 rounded-lg cursor-not-allowed"
+                      >
+                        <i class="fas fa-paper-plane text-sm"></i>
+                      </button>
+                    </div>
+                    <div
+                      class="mt-1.5 flex justify-between text-xs text-gray-400"
+                    >
+                      <span>Messages are saved automatically</span>
+                      <span>Offline</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Account Content (Settings) -->
+          <div id="business-account-content" class="hidden">
+            <h2 class="text-xl font-bold mb-4">Account Settings</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Business Information -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">Business Information</h3>
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Business Name</label
+                    >
+                    <input
+                      type="text"
+                      value=""
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="Enter your business name"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Business Type</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">Select business type</option>
+                      <option>Food & Beverage</option>
+                      <option>Retail</option>
+                      <option>Services</option>
+                      <option>Beauty & Wellness</option>
+                      <option>Home & Garden</option>
+                      <option>Arts & Crafts</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Location</label
+                    >
+                    <input
+                      type="text"
+                      value=""
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="Enter your business address"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Business Hours</label
+                    >
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <select
+                          class="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm"
+                        >
+                          <option>Mon-Fri</option>
+                          <option>Saturday</option>
+                          <option>Sunday</option>
+                        </select>
                       </div>
-                      <span id="detail-type" class="text-gray-600"></span>
+                      <div class="flex space-x-1">
+                        <input
+                          type="time"
+                          value=""
+                          class="w-1/2 px-2 py-2 border border-gray-300 rounded-lg text-sm"
+                          placeholder="09:00"
+                        />
+                        <span class="self-center text-sm">to</span>
+                        <input
+                          type="time"
+                          value=""
+                          class="w-1/2 px-2 py-2 border border-gray-300 rounded-lg text-sm"
+                          placeholder="17:00"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div class="text-right">
-                    <div class="flex items-center text-gray-600">
-                      <i class="fas fa-map-marker-alt mr-1"></i>
-                      <span id="detail-distance"></span>
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Contact Email</label
+                    >
+                    <input
+                      type="email"
+                      value=""
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="business@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Phone Number</label
+                    >
+                    <input
+                      type="tel"
+                      value=""
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                  <button
+                    class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+
+              <!-- Privacy & Preferences -->
+              <div class="bg-white p-4 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-3">
+                  Privacy & Preferences
+                </h3>
+                <div class="space-y-4">
+                  <!-- Visibility Toggle -->
+                  <div>
+                    <label class="block text-gray-700 mb-1 text-sm"
+                      >Business Visibility</label
+                    >
+                    <div
+                      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <div>
+                        <h4 class="font-medium text-sm">
+                          Make my business public
+                        </h4>
+                        <p class="text-xs text-gray-500">
+                          Allow customers to find and contact your business
+                        </p>
+                      </div>
+                      <label
+                        class="relative inline-flex items-center cursor-pointer"
+                      >
+                        <input type="checkbox" class="sr-only peer" />
+                        <div
+                          class="toggle-bg w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"
+                        >
+                          <div
+                            class="toggle-circle w-4 h-4 bg-white rounded-full"
+                          ></div>
+                        </div>
+                      </label>
                     </div>
                   </div>
-                </div>
 
-                <p id="detail-description" class="text-gray-700 mb-6"></p>
+                  <!-- Notification Preferences -->
+                  <div>
+                    <h4 class="font-medium text-sm mb-2">
+                      Notification Preferences
+                    </h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="notif-orders"
+                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                        <label for="notif-orders" class="text-gray-700 text-sm"
+                          >New orders and sales</label
+                        >
+                      </div>
+                      <div class="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="notif-messages"
+                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                        <label
+                          for="notif-messages"
+                          class="text-gray-700 text-sm"
+                          >New customer messages</label
+                        >
+                      </div>
+                      <div class="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="notif-reviews"
+                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                        <label for="notif-reviews" class="text-gray-700 text-sm"
+                          >New reviews and ratings</label
+                        >
+                      </div>
+                      <div class="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="notif-promos"
+                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                        <label for="notif-promos" class="text-gray-700 text-sm"
+                          >Promotional offers from BusinessMonkey</label
+                        >
+                      </div>
+                    </div>
+                  </div>
 
-                <div id="detail-coupons" class="mb-6 hidden">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">
-                    Available Coupons
-                  </h3>
-                  <div id="coupons-container" class="space-y-2"></div>
-                </div>
+                  <!-- Data Sharing -->
+                  <div>
+                    <h4 class="font-medium text-sm mb-2">
+                      Data Sharing Preferences
+                    </h4>
+                    <div
+                      class="bg-blue-50 p-3 rounded-lg border border-blue-200"
+                    >
+                      <p class="text-xs text-blue-800 mb-2">
+                        <i class="fas fa-info-circle mr-1 text-xs"></i> We never
+                        sell your customer data. These settings control how we
+                        use anonymized data to improve our service.
+                      </p>
+                      <div class="space-y-1.5">
+                        <div class="flex items-start">
+                          <input
+                            type="checkbox"
+                            id="share-analytics"
+                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                          />
+                          <label
+                            for="share-analytics"
+                            class="text-gray-700 text-xs"
+                            >Share anonymized sales data for industry
+                            benchmarking</label
+                          >
+                        </div>
+                        <div class="flex items-start">
+                          <input
+                            type="checkbox"
+                            id="share-reviews"
+                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
+                          />
+                          <label
+                            for="share-reviews"
+                            class="text-gray-700 text-xs"
+                            >Allow reviews to appear in BusinessMonkey discovery
+                            features</label
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                <button
-                  onclick="showCustomerView('messages')"
-                  class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
-                >
-                  <i class="fas fa-comment-dots mr-2"></i> Contact Business
-                </button>
-              </div>
-            </div>
-          </div>
+                  <!-- Subscription Status -->
+                  <div>
+                    <h4 class="font-medium text-sm mb-2">Subscription</h4>
+                    <div
+                      class="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <p class="text-gray-700 font-semibold text-sm">
+                        <i
+                          class="fas fa-info-circle mr-1 text-gray-400 text-xs"
+                        ></i>
+                        No active subscription
+                      </p>
+                      <p class="text-xs text-gray-500 mt-1">
+                        Subscribe to access premium features like coupons,
+                        analytics, and customer messaging
+                      </p>
+                      <button
+                        class="mt-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 transition-colors text-xs"
+                      >
+                        Start $2.99/month Subscription
+                      </button>
+                    </div>
+                  </div>
 
-          <!-- Messages View -->
-          <div id="customer-messages" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Messages</h2>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-              <div class="p-4 border-b">
-                <h3 class="font-semibold">Business Conversations</h3>
-              </div>
-              <div
-                id="customer-messages-container"
-                class="h-96 overflow-y-auto p-4 space-y-4"
-              >
-                <div class="text-center text-gray-500 py-8">
-                  No messages yet. Start a conversation with a business from the
-                  catalog!
-                </div>
-              </div>
-              <div class="p-4 border-t flex">
-                <input
-                  type="text"
-                  id="customer-message-input"
-                  placeholder="Type your message..."
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                <button
-                  onclick="sendCustomerMessage()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition-colors"
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Account View -->
-          <div id="customer-account" class="hidden max-w-2xl">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">
-              Account Settings
-            </h2>
-            <div class="bg-white p-6 rounded-lg shadow">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Full Name</label
+                  <button
+                    class="mt-3 w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 transition-colors text-sm"
                   >
-                  <input
-                    type="text"
-                    id="account-customer-name"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
+                    Save Privacy Settings
+                  </button>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
-                    >Email</label
-                  >
-                  <input
-                    type="email"
-                    id="account-customer-email"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <button
-                  onclick="saveCustomerAccount()"
-                  class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Save Changes
-                </button>
               </div>
             </div>
           </div>
@@ -757,534 +776,224 @@
     </div>
 
     <script>
-      // Mock data
-      const mockBusinesses = [
-        {
-          id: 1,
-          name: "Bella's Bakery",
-          type: "Food & Beverage",
-          rating: 4.8,
-          distance: "0.5 miles",
-          image:
-            "https://placehold.co/300x200/8B5CF6/FFFFFF?text=Bella's+Bakery",
-          description: "Artisanal breads and pastries made fresh daily",
-          coupons: ["20% off first order", "Buy 1 Get 1 Free on weekends"],
-        },
-        {
-          id: 2,
-          name: "Green Thumb Nursery",
-          type: "Retail",
-          rating: 4.6,
-          distance: "1.2 miles",
-          image: "https://placehold.co/300x200/10B981/FFFFFF?text=Green+Thumb",
-          description: "Local plant shop with rare and exotic plants",
-          coupons: ["Free pot with purchase over $50"],
-        },
-        {
-          id: 3,
-          name: "TechFix Solutions",
-          type: "Services",
-          rating: 4.9,
-          distance: "0.8 miles",
-          image: "https://placehold.co/300x200/3B82F6/FFFFFF?text=TechFix",
-          description: "Professional computer and phone repair services",
-          coupons: ["15% off diagnostic fee"],
-        },
-        {
-          id: 4,
-          name: "Vintage Vogue",
-          type: "Retail",
-          rating: 4.7,
-          distance: "1.5 miles",
-          image:
-            "https://placehold.co/300x200/EC4899/FFFFFF?text=Vintage+Vogue",
-          description: "Curated vintage clothing and accessories",
-          coupons: ["Free shipping on orders over $75"],
-        },
-      ];
-
-      // State
-      let userType = null;
-      let currentBusiness = null;
-      let coupons = [];
-      let messages = [];
-
-      // DOM Elements
-      const views = {
-        landing: document.getElementById("landing-page"),
-        businessSignup: document.getElementById("business-signup"),
-        customerSignup: document.getElementById("customer-signup"),
-        businessDashboard: document.getElementById("business-dashboard"),
-        customerDashboard: document.getElementById("customer-dashboard"),
-      };
-
-      // Show views
-      function showView(view) {
-        Object.values(views).forEach((v) => v.classList.add("hidden"));
-        views[view].classList.remove("hidden");
-      }
-
-      function showLanding() {
-        showView("landing");
-      }
-
-      function showBusinessSignup() {
-        showView("businessSignup");
-      }
-
-      function showCustomerSignup() {
-        showView("customerSignup");
-      }
-
-      function showBusinessDashboard() {
-        userType = "business";
-        showView("businessDashboard");
-        showBusinessView("home");
-      }
-
-      function showCustomerDashboard() {
-        userType = "customer";
-        showView("customerDashboard");
-        showCustomerView("catalog");
-        renderBusinesses();
-      }
-
-      // Business dashboard navigation
-      function showBusinessView(view) {
-        const views = ["home", "coupons", "messages", "account"];
-        views.forEach((v) => {
-          document.getElementById(`business-${v}`).classList.add("hidden");
-        });
-        document.getElementById(`business-${view}`).classList.remove("hidden");
-
-        // Update active tab
+      // Tab switching functionality
+      function showBusinessHome() {
         document
-          .querySelectorAll("#business-dashboard nav button")
-          .forEach((btn) => {
-            btn.classList.remove("border-purple-500", "text-purple-600");
-            btn.classList.add("border-transparent", "text-gray-500");
-          });
-        event.target.classList.remove("border-transparent", "text-gray-500");
-        event.target.classList.add("border-purple-500", "text-purple-600");
-      }
-
-      // Customer dashboard navigation
-      function showCustomerView(view) {
-        const views = ["catalog", "business-detail", "messages", "account"];
-        views.forEach((v) => {
-          document.getElementById(`customer-${v}`).classList.add("hidden");
-        });
-        document.getElementById(`customer-${view}`).classList.remove("hidden");
-
-        // Update active tab
+          .getElementById("business-home-content")
+          .classList.remove("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
         document
-          .querySelectorAll("#customer-dashboard nav button")
-          .forEach((btn) => {
-            btn.classList.remove("border-purple-500", "text-purple-600");
-            btn.classList.add("border-transparent", "text-gray-500");
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        document
+          .getElementById("tab-dashboard")
+          .classList.add("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-dashboard")
+          .classList.remove("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-coupons")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-coupons")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-messages")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-messages")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-settings")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-settings")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+      }
+
+      function showCouponMaker() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document
+          .getElementById("coupon-maker-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        document
+          .getElementById("tab-dashboard")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-dashboard")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-coupons")
+          .classList.add("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-coupons")
+          .classList.remove("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-messages")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-messages")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-settings")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-settings")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+      }
+
+      function showBusinessMessages() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.add("hidden");
+        document
+          .getElementById("tab-dashboard")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-dashboard")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-coupons")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-coupons")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-messages")
+          .classList.add("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-messages")
+          .classList.remove("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-settings")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-settings")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+      }
+
+      function showBusinessAccount() {
+        document
+          .getElementById("business-home-content")
+          .classList.add("hidden");
+        document.getElementById("coupon-maker-content").classList.add("hidden");
+        document
+          .getElementById("business-messages-content")
+          .classList.add("hidden");
+        document
+          .getElementById("business-account-content")
+          .classList.remove("hidden");
+        document
+          .getElementById("tab-dashboard")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-dashboard")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-coupons")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-coupons")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-messages")
+          .classList.add("border-transparent", "text-gray-500");
+        document
+          .getElementById("tab-messages")
+          .classList.remove("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-settings")
+          .classList.add("border-indigo-500", "text-indigo-600");
+        document
+          .getElementById("tab-settings")
+          .classList.remove("border-transparent", "text-gray-500");
+      }
+
+      // Coupon creation functionality
+      function createCoupon(e) {
+        e.preventDefault();
+        const code = document.getElementById("coupon-code").value;
+        const discount = document.getElementById("coupon-discount").value;
+        const expires = document.getElementById("coupon-expires").value;
+        if (code && discount && expires) {
+          const couponsList = document.getElementById("business-coupons-list");
+          const expiryDate = new Date(expires);
+          const formattedDate = expiryDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
           });
-        if (view !== "business-detail") {
-          event.target.classList.remove("border-transparent", "text-gray-500");
-          event.target.classList.add("border-purple-500", "text-purple-600");
+          const newCoupon = document.createElement("div");
+          newCoupon.className =
+            "flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200";
+          newCoupon.innerHTML = `
+<div>
+<p class="font-bold text-indigo-700 text-sm">${code.toUpperCase()}</p>
+<p class="text-gray-700 text-xs">${discount}</p>
+</div>
+<div class="text-right">
+<p class="text-xs text-gray-500">Expires: ${formattedDate}</p>
+<p class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mt-0.5">0 redemptions</p>
+</div>
+`;
+          // Clear empty state if exists
+          const emptyState = couponsList.querySelector(".empty-state");
+          if (emptyState) {
+            emptyState.remove();
+          }
+          couponsList.appendChild(newCoupon);
+          // Reset form
+          document.getElementById("coupon-code").value = "";
+          document.getElementById("coupon-discount").value = "";
+          document.getElementById("coupon-expires").value = "";
+          // Show success message
+          alert(`Coupon "${code}" created successfully!`);
         }
       }
 
-      // Handle signups
-      function handleBusinessSignup(e) {
-        e.preventDefault();
-        const name = document.getElementById("business-name").value;
-        const email = document.getElementById("business-email").value;
-        const type = document.getElementById("business-type").value;
-        const description = document.getElementById(
-          "business-description"
-        ).value;
-
-        // Save to localStorage (mock)
-        localStorage.setItem(
-          "businessData",
-          JSON.stringify({ name, email, type, description })
-        );
-
-        // Update display
-        document.getElementById("display-business-name").textContent = name;
-        document.getElementById("display-business-type").textContent = type;
-        document.getElementById("display-business-description").textContent =
-          description;
-
-        // Update account form
-        document.getElementById("account-business-name").value = name;
-        document.getElementById("account-business-email").value = email;
-        document.getElementById("account-business-type").value = type;
-        document.getElementById("account-business-description").value =
-          description;
-
-        showBusinessDashboard();
-      }
-
-      function handleCustomerSignup(e) {
-        e.preventDefault();
-        const name = document.getElementById("customer-name").value;
-        const email = document.getElementById("customer-email").value;
-
-        // Save to localStorage (mock)
-        localStorage.setItem("customerData", JSON.stringify({ name, email }));
-
-        // Update account form
-        document.getElementById("account-customer-name").value = name;
-        document.getElementById("account-customer-email").value = email;
-
-        showCustomerDashboard();
-      }
-
-      // Business functions
-      function addCoupon() {
-        const input = document.getElementById("new-coupon");
-        const coupon = input.value.trim();
-        if (coupon) {
-          coupons.push(coupon);
-          input.value = "";
-          renderCoupons();
-        }
-      }
-
-      function renderCoupons() {
-        const container = document.getElementById("coupons-list");
-        if (coupons.length === 0) {
-          container.innerHTML =
-            '<div class="bg-white p-8 rounded-lg shadow text-center"><p class="text-gray-500">No coupons created yet. Add your first coupon above!</p></div>';
-          return;
-        }
-
-        container.innerHTML = coupons
-          .map(
-            (coupon, index) => `
-                <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center">
-                    <span class="text-gray-900">${coupon}</span>
-                    <button onclick="deleteCoupon(${index})" class="text-red-600 hover:text-red-800">Delete</button>
-                </div>
-            `
-          )
-          .join("");
-      }
-
-      function deleteCoupon(index) {
-        coupons.splice(index, 1);
-        renderCoupons();
-      }
-
+      // Chat functionality
       function sendBusinessMessage() {
-        const input = document.getElementById("business-message-input");
-        const message = input.value.trim();
+        const messageInput = document.getElementById("business-message-input");
+        const message = messageInput.value.trim();
         if (message) {
-          messages.push({
-            id: messages.length + 1,
-            text: message,
-            sender: "business",
-            timestamp: new Date().toLocaleTimeString(),
-          });
-          input.value = "";
-          renderBusinessMessages();
+          const chatMessages = document.getElementById("chat-messages");
+          const newMessage = document.createElement("div");
+          newMessage.className = "chat-bubble business";
+          newMessage.textContent = message;
+          chatMessages.appendChild(newMessage);
+          messageInput.value = "";
+          chatMessages.scrollTop = chatMessages.scrollHeight;
         }
       }
 
-      function renderBusinessMessages() {
-        const container = document.getElementById(
-          "business-messages-container"
-        );
-        if (messages.length === 0) {
-          container.innerHTML =
-            '<div class="text-center text-gray-500 py-8">No messages yet. Customers will be able to contact you once they find your business!</div>';
-          return;
-        }
-
-        container.innerHTML = messages
-          .map(
-            (msg) => `
-                <div class="flex ${
-                  msg.sender === "business" ? "justify-end" : "justify-start"
-                }">
-                    <div class="max-w-xs px-4 py-2 rounded-lg ${
-                      msg.sender === "business"
-                        ? "bg-purple-100 text-gray-900"
-                        : "bg-gray-100 text-gray-900"
-                    }">
-                        ${msg.text}
-                        <p class="text-xs text-gray-500 mt-1">${
-                          msg.timestamp
-                        }</p>
-                    </div>
-                </div>
-            `
-          )
-          .join("");
-      }
-
-      function saveBusinessAccount() {
-        const name = document.getElementById("account-business-name").value;
-        const email = document.getElementById("account-business-email").value;
-        const type = document.getElementById("account-business-type").value;
-        const description = document.getElementById(
-          "account-business-description"
-        ).value;
-
-        localStorage.setItem(
-          "businessData",
-          JSON.stringify({ name, email, type, description })
-        );
-
-        // Update display
-        document.getElementById("display-business-name").textContent = name;
-        document.getElementById("display-business-type").textContent = type;
-        document.getElementById("display-business-description").textContent =
-          description;
-
-        alert("Account updated successfully!");
-      }
-
-      // Customer functions
-      function renderBusinesses() {
-        const container = document.getElementById("businesses-grid");
-        container.innerHTML = mockBusinesses
-          .map(
-            (business) => `
-                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer" onclick="showBusinessDetail(${
-                  business.id
-                })">
-                    <img src="${business.image}" alt="${
-              business.name
-            }" class="w-full h-48 object-cover rounded-t-lg">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-semibold text-gray-900">${
-                              business.name
-                            }</h3>
-                            <div class="flex items-center bg-yellow-100 px-2 py-1 rounded">
-                                <i class="fas fa-star text-yellow-600 mr-1"></i>
-                                <span class="text-sm font-medium text-yellow-800">${
-                                  business.rating
-                                }</span>
-                            </div>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-2">${
-                          business.type
-                        }</p>
-                        <p class="text-gray-700 text-sm mb-3">${
-                          business.description
-                        }</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i class="fas fa-map-marker-alt mr-1"></i>
-                            ${business.distance}
-                        </div>
-                        ${
-                          business.coupons.length > 0
-                            ? `
-                            <div class="mt-3 p-2 bg-green-50 rounded">
-                                <p class="text-xs text-green-700 font-medium">
-                                    ${business.coupons.length} coupon${
-                                business.coupons.length !== 1 ? "s" : ""
-                              } available
-                                </p>
-                            </div>
-                        `
-                            : ""
-                        }
-                    </div>
-                </div>
-            `
-          )
-          .join("");
-      }
-
-      function showBusinessDetail(businessId) {
-        const business = mockBusinesses.find((b) => b.id === businessId);
-        if (!business) return;
-
-        currentBusiness = business;
-        document.getElementById("detail-image").src = business.image;
-        document.getElementById("detail-name").textContent = business.name;
-        document.getElementById("detail-rating").textContent = business.rating;
-        document.getElementById("detail-type").textContent = business.type;
-        document.getElementById("detail-distance").textContent =
-          business.distance;
-        document.getElementById("detail-description").textContent =
-          business.description;
-
-        // Render coupons
-        const couponsContainer = document.getElementById("coupons-container");
-        if (business.coupons.length > 0) {
-          document.getElementById("detail-coupons").classList.remove("hidden");
-          couponsContainer.innerHTML = business.coupons
-            .map(
-              (coupon) => `
-                    <div class="bg-green-50 p-3 rounded-lg">
-                        <p class="text-green-800 font-medium">${coupon}</p>
-                    </div>
-                `
-            )
-            .join("");
-        } else {
-          document.getElementById("detail-coupons").classList.add("hidden");
-        }
-
-        showCustomerView("business-detail");
-      }
-
-      function filterBusinesses() {
-        const searchTerm = document
-          .getElementById("search-input")
-          .value.toLowerCase();
-        const selectedType = document.getElementById("type-filter").value;
-
-        const filtered = mockBusinesses.filter((business) => {
-          const matchesSearch =
-            business.name.toLowerCase().includes(searchTerm) ||
-            business.description.toLowerCase().includes(searchTerm);
-          const matchesType =
-            selectedType === "All" || business.type === selectedType;
-          return matchesSearch && matchesType;
-        });
-
-        const container = document.getElementById("businesses-grid");
-        container.innerHTML = filtered
-          .map(
-            (business) => `
-                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer" onclick="showBusinessDetail(${
-                  business.id
-                })">
-                    <img src="${business.image}" alt="${
-              business.name
-            }" class="w-full h-48 object-cover rounded-t-lg">
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-semibold text-gray-900">${
-                              business.name
-                            }</h3>
-                            <div class="flex items-center bg-yellow-100 px-2 py-1 rounded">
-                                <i class="fas fa-star text-yellow-600 mr-1"></i>
-                                <span class="text-sm font-medium text-yellow-800">${
-                                  business.rating
-                                }</span>
-                            </div>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-2">${
-                          business.type
-                        }</p>
-                        <p class="text-gray-700 text-sm mb-3">${
-                          business.description
-                        }</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <i class="fas fa-map-marker-alt mr-1"></i>
-                            ${business.distance}
-                        </div>
-                        ${
-                          business.coupons.length > 0
-                            ? `
-                            <div class="mt-3 p-2 bg-green-50 rounded">
-                                <p class="text-xs text-green-700 font-medium">
-                                    ${business.coupons.length} coupon${
-                                business.coupons.length !== 1 ? "s" : ""
-                              } available
-                                </p>
-                            </div>
-                        `
-                            : ""
-                        }
-                    </div>
-                </div>
-            `
-          )
-          .join("");
-      }
-
-      function sendCustomerMessage() {
-        const input = document.getElementById("customer-message-input");
-        const message = input.value.trim();
-        if (message) {
-          messages.push({
-            id: messages.length + 1,
-            text: message,
-            sender: "customer",
-            timestamp: new Date().toLocaleTimeString(),
-          });
-          input.value = "";
-          renderCustomerMessages();
-        }
-      }
-
-      function renderCustomerMessages() {
-        const container = document.getElementById(
-          "customer-messages-container"
-        );
-        if (messages.length === 0) {
-          container.innerHTML =
-            '<div class="text-center text-gray-500 py-8">No messages yet. Start a conversation with a business from the catalog!</div>';
-          return;
-        }
-
-        container.innerHTML = messages
-          .map(
-            (msg) => `
-                <div class="flex ${
-                  msg.sender === "customer" ? "justify-end" : "justify-start"
-                }">
-                    <div class="max-w-xs px-4 py-2 rounded-lg ${
-                      msg.sender === "customer"
-                        ? "bg-purple-100 text-gray-900"
-                        : "bg-gray-100 text-gray-900"
-                    }">
-                        ${msg.text}
-                        <p class="text-xs text-gray-500 mt-1">${
-                          msg.timestamp
-                        }</p>
-                    </div>
-                </div>
-            `
-          )
-          .join("");
-      }
-
-      function saveCustomerAccount() {
-        const name = document.getElementById("account-customer-name").value;
-        const email = document.getElementById("account-customer-email").value;
-
-        localStorage.setItem("customerData", JSON.stringify({ name, email }));
-        alert("Account updated successfully!");
-      }
-
+      // Logout function
       function logout() {
-        userType = null;
-        currentBusiness = null;
-        coupons = [];
-        messages = [];
-        showLanding();
+        if (confirm("Are you sure you want to log out?")) {
+          alert("You have been logged out successfully.");
+          // In a real app, this would redirect to login page
+        }
       }
 
-      // Initialize
-      window.onload = function () {
-        const businessData = localStorage.getItem("businessData");
-        const customerData = localStorage.getItem("customerData");
-
-        if (businessData) {
-          const data = JSON.parse(businessData);
-          document.getElementById("display-business-name").textContent =
-            data.name;
-          document.getElementById("display-business-type").textContent =
-            data.type;
-          document.getElementById("display-business-description").textContent =
-            data.description;
-          document.getElementById("account-business-name").value = data.name;
-          document.getElementById("account-business-email").value = data.email;
-          document.getElementById("account-business-type").value = data.type;
-          document.getElementById("account-business-description").value =
-            data.description;
-        }
-
-        if (customerData) {
-          const data = JSON.parse(customerData);
-          document.getElementById("account-customer-name").value = data.name;
-          document.getElementById("account-customer-email").value = data.email;
-        }
-      };
+      // Initialize with dashboard tab active
+      showBusinessHome();
     </script>
   </body>
 </html>
