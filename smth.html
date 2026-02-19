@@ -666,7 +666,7 @@
               the heart of local economies. Through transparency, direct
               connection, and mutual support, BusinessMonkey aims to create a
               future where every local entrepreneur has the tools to succeed and
-              every community member feels invested in their neighborhood’s
+              every community member feels invested in their neighborhood's
               success.
             </p>
           </div>
@@ -890,7 +890,7 @@
           <h2 class="text-2xl font-bold text-center mb-6">
             Sign In to BusinessMonkey
           </h2>
-          <form onsubmit="handleLogin(event)">
+          <form onsubmit="event.preventDefault()">
             <div class="mb-4">
               <label class="block text-gray-700 mb-2">Email</label>
               <div class="relative">
@@ -2119,30 +2119,5 @@ ${business.coupons.length} coupon${business.coupons.length !== 1 ? "s" : ""}
       // Initialize
       showLanding();
     </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBB2wDeMmEuxNtYNrlvCCQzGr_j__XuMXk",
-    authDomain: "fblc-65780.firebaseapp.com",
-    projectId: "fblc-65780",
-    storageBucket: "fblc-65780.firebasestorage.app",
-    messagingSenderId: "189461780252",
-    appId: "1:189461780252:web:6a4b395500808324aeccd9",
-    measurementId: "G-DJ2V6SN82M"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app);
-</script>
   </body>
 </html>
