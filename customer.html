@@ -23,25 +23,17 @@
       };
     </script>
     <style>
+      /* Hover effects */
       .business-card:hover {
         transform: translateY(-5px);
-        box-shadow:
-          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
           0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-      .stats-card {
-        transition: all 0.3s ease;
-      }
-      .stats-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
       }
       .chat-bubble {
         max-width: 70%;
         padding: 8px 12px;
         border-radius: 18px;
         margin-bottom: 10px;
-        position: relative;
         line-height: 1.4;
         font-size: 0.9rem;
       }
@@ -57,13 +49,6 @@
         align-self: flex-start;
         border-bottom-left-radius: 4px;
       }
-      .chat-contact.active {
-        background-color: #4f46e5;
-        color: white;
-      }
-      .chat-contact:hover:not(.active) {
-        background-color: #f3f4f6;
-      }
       .empty-state {
         display: flex;
         flex-direction: column;
@@ -72,12 +57,7 @@
         padding: 4rem 2rem;
         text-align: center;
         color: #6b7280;
-        min-height: 400px;
-      }
-      .empty-state i {
-        font-size: 5rem;
-        margin-bottom: 1.5rem;
-        opacity: 0.2;
+        min-height: 300px;
       }
       .toggle-bg {
         background-color: #d1d5db;
@@ -94,393 +74,162 @@
       }
     </style>
   </head>
-  <body class="bg-gray-50 min-h-screen">
-    <!-- Customer Dashboard -->
-    <div id="customer-dashboard" class="min-h-screen flex flex-col">
-      <!-- Customer Header -->
-      <header class="bg-white shadow-sm">
-        <div
-          class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center"
-        >
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
-            >
-              <i class="fas fa-monkey text-white text-lg"></i>
-            </div>
-            <h1 class="text-xl font-bold text-gray-800">
-              Business<span class="text-amber-600">Monkey</span>
-            </h1>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-monkey text-white text-lg"></i>
           </div>
-          <button
-            onclick="logout()"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+          <h1 class="text-xl font-bold text-gray-800">
+            Business<span class="text-amber-600">Monkey</span>
+          </h1>
+        </div>
+        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+          <i class="fas fa-sign-out-alt mr-2"></i>Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex space-x-8 border-b border-gray-200">
+          <button onclick="switchTab('catalog')" id="tab-catalog" class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 flex items-center">
+            <i class="fas fa-search mr-2"></i> Catalog
+          </button>
+          <button onclick="switchTab('messages')" id="tab-messages" class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center">
+            <i class="fas fa-comment-dots mr-2"></i> Messages
+          </button>
+          <button onclick="switchTab('account')" id="tab-settings" class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center">
+            <i class="fas fa-user mr-2"></i> Settings
           </button>
         </div>
-      </header>
-      <!-- Customer Navigation -->
-      <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="flex space-x-8 border-b border-gray-200">
-            <button
-              onclick="showCatalog()"
-              id="tab-catalog"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 flex items-center"
-            >
-              <i class="fas fa-search mr-2"></i> Catalog
-            </button>
-            <button
-              onclick="showCustomerMessages()"
-              id="tab-messages"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
-            >
-              <i class="fas fa-comment-dots mr-2"></i> Messages
-            </button>
-            <button
-              onclick="showCustomerAccount()"
-              id="tab-settings"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
-            >
-              <i class="fas fa-user mr-2"></i> Settings
-            </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto max-w-7xl mx-auto px-4 py-4">
+      <!-- Catalog Tab -->
+      <div id="catalog" class="tab-content">
+        <div class="mb-6">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            <input
+              type="text"
+              id="search-input"
+              oninput="renderBusinesses()"
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              placeholder="Search businesses by name, type, or location..."
+            />
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2" id="filter-buttons">
+            <button data-type="" class="filter-btn px-3 py-1 rounded-full text-sm bg-indigo-600 text-white">All Types</button>
+            <button data-type="Food & Beverage" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Food & Beverage</button>
+            <button data-type="Retail" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Retail</button>
+            <button data-type="Services" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Services</button>
+            <button data-type="Beauty & Wellness" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Beauty & Wellness</button>
+            <button data-type="Home & Garden" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Home & Garden</button>
+            <button data-type="Arts & Crafts" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Arts & Crafts</button>
           </div>
         </div>
-      </nav>
-      <!-- Main Content Area -->
-      <div class="flex-1 overflow-auto">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-          <!-- Catalog Content -->
-          <div id="catalog-content">
-            <div class="mb-6">
-              <div class="relative">
-                <i
-                  class="fas fa-search absolute left-3 top-3 text-gray-400"
-                ></i>
-                <input
-                  type="text"
-                  id="search-input"
-                  oninput="filterBusinesses()"
-                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                  placeholder="Search businesses by name, type, or location..."
-                />
+        <div id="businesses-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="empty-state">
+            <i class="fas fa-store"></i>
+            <p class="text-3xl font-bold text-gray-700 mb-4">No businesses found</p>
+            <p class="text-xl text-gray-500 max-w-2xl">Start exploring local businesses in your area. As business owners join BusinessMonkey, they'll appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Tab -->
+      <div id="messages" class="tab-content hidden">
+        <h2 class="text-xl font-bold mb-4">Messages</h2>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden" style="height: calc(100vh - 240px)">
+          <div class="grid md:grid-cols-3 h-full">
+            <div class="border-r border-gray-200 overflow-y-auto">
+              <div class="p-3 border-b border-gray-200">
+                <h3 class="font-semibold text-sm">Businesses</h3>
               </div>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <button
-                  onclick="filterByType('')"
-                  class="px-3 py-1 rounded-full text-sm bg-indigo-600 text-white"
-                  id="all-types-btn"
-                >
-                  All Types
-                </button>
-                <button
-                  onclick="filterByType('Food & Beverage')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="food-btn"
-                >
-                  Food & Beverage
-                </button>
-                <button
-                  onclick="filterByType('Retail')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="retail-btn"
-                >
-                  Retail
-                </button>
-                <button
-                  onclick="filterByType('Services')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="services-btn"
-                >
-                  Services
-                </button>
-                <button
-                  onclick="filterByType('Beauty & Wellness')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="beauty-btn"
-                >
-                  Beauty & Wellness
-                </button>
-                <button
-                  onclick="filterByType('Home & Garden')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="home-btn"
-                >
-                  Home & Garden
-                </button>
-                <button
-                  onclick="filterByType('Arts & Crafts')"
-                  class="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700"
-                  id="arts-btn"
-                >
-                  Arts & Crafts
-                </button>
+              <div id="conversations-list" class="empty-state py-8">
+                <i class="fas fa-comments"></i>
+                <p class="text-base font-medium">No conversations yet</p>
+                <p class="mt-1 text-sm">Start a conversation by contacting a business from the catalog</p>
               </div>
             </div>
-            <div
-              id="businesses-grid"
-              class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              <div class="col-span-full">
-                <div class="empty-state">
-                  <i class="fas fa-store"></i>
-                  <p class="text-3xl font-bold text-gray-700 mb-4">
-                    No businesses found
-                  </p>
-                  <p class="text-xl text-gray-500 max-w-2xl">
-                    Start exploring local businesses in your area. As business
-                    owners join BusinessMonkey, they'll appear here for you to
-                    discover and connect with.
-                  </p>
+            <div class="md:col-span-2 flex flex-col">
+              <div class="p-3 border-b border-gray-200">
+                <h3 class="font-semibold text-sm" id="chat-business-name">Select a business to chat</h3>
+              </div>
+              <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex items-center justify-center bg-gray-50">
+                <div class="text-center text-gray-500">
+                  <i class="fas fa-comment-dots text-3xl mb-3 opacity-50"></i>
+                  <p class="text-base font-medium">No conversation selected</p>
+                  <p class="mt-1 text-sm">Select a business from the list to start chatting</p>
+                </div>
+              </div>
+              <div class="p-3 border-t border-gray-200">
+                <div class="flex space-x-2">
+                  <input type="text" id="customer-message-input" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-sm" placeholder="Select a business to start messaging..." disabled />
+                  <button class="bg-gray-400 text-white p-2 rounded-lg cursor-not-allowed">
+                    <i class="fas fa-paper-plane text-sm"></i>
+                  </button>
+                </div>
+                <div class="mt-1.5 flex justify-between text-xs text-gray-400">
+                  <span>Messages are saved automatically</span>
+                  <span>Offline</span>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Customer Messages Content -->
-          <div id="customer-messages-content" class="hidden">
-            <h2 class="text-xl font-bold mb-4">Messages</h2>
-            <div
-              class="bg-white rounded-xl shadow-md overflow-hidden"
-              style="height: calc(100vh - 240px)"
-            >
-              <div class="grid md:grid-cols-3 h-full">
-                <!-- Conversations List -->
-                <div class="border-r border-gray-200 overflow-y-auto">
-                  <div class="p-3 border-b border-gray-200">
-                    <h3 class="font-semibold text-sm">Businesses</h3>
-                  </div>
-                  <div id="conversations-list" class="empty-state py-8">
-                    <i class="fas fa-comments"></i>
-                    <p class="text-base font-medium">No conversations yet</p>
-                    <p class="mt-1 text-sm">
-                      Start a conversation by contacting a business from the
-                      catalog
-                    </p>
-                  </div>
-                </div>
-                <!-- Chat Area -->
-                <div class="md:col-span-2 flex flex-col">
-                  <div class="p-3 border-b border-gray-200">
-                    <h3 class="font-semibold text-sm" id="chat-business-name">
-                      Select a business to chat
-                    </h3>
-                  </div>
-                  <div
-                    id="chat-messages"
-                    class="flex-1 p-3 overflow-y-auto flex items-center justify-center bg-gray-50"
-                  >
-                    <div class="text-center text-gray-500">
-                      <i
-                        class="fas fa-comment-dots text-3xl mb-3 opacity-50"
-                      ></i>
-                      <p class="text-base font-medium">
-                        No conversation selected
-                      </p>
-                      <p class="mt-1 text-sm">
-                        Select a business from the list to start chatting
-                      </p>
-                    </div>
-                  </div>
-                  <div class="p-3 border-t border-gray-200">
-                    <div class="flex space-x-2">
-                      <input
-                        type="text"
-                        id="customer-message-input"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-sm"
-                        placeholder="Select a business to start messaging..."
-                        disabled
-                      />
-                      <button
-                        class="bg-gray-400 text-white p-2 rounded-lg cursor-not-allowed"
-                      >
-                        <i class="fas fa-paper-plane text-sm"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="mt-1.5 flex justify-between text-xs text-gray-400"
-                    >
-                      <span>Messages are saved automatically</span>
-                      <span>Offline</span>
-                    </div>
-                  </div>
-                </div>
+        </div>
+      </div>
+
+      <!-- Account Tab -->
+      <div id="account" class="tab-content hidden">
+        <h2 class="text-xl font-bold mb-4">Account Settings</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-3">Account Information</h3>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-gray-700 mb-1 text-sm">Email Address</label>
+                <input type="email" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50" placeholder="your@email.com" readonly />
               </div>
+              <div>
+                <label class="block text-gray-700 mb-1 text-sm">Account Type</label>
+                <input type="text" value="Customer (Free)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50" readonly />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 text-sm">Location Preference</label>
+                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+                  <option value="">Set your location</option>
+                  <option>Within 1 mile</option>
+                  <option>Within 5 miles</option>
+                  <option>Within 10 miles</option>
+                  <option>City-wide</option>
+                  <option>Show all businesses</option>
+                </select>
+              </div>
+              <button class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">Save Preferences</button>
             </div>
           </div>
-          <!-- Customer Account Content (Settings) -->
-          <div id="customer-account-content" class="hidden">
-            <h2 class="text-xl font-bold mb-4">Account Settings</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- Account Information -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">Account Information</h3>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Email Address</label
-                    >
-                    <input
-                      type="email"
-                      value=""
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50"
-                      placeholder="your@email.com"
-                      readonly
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Account Type</label
-                    >
-                    <input
-                      type="text"
-                      value="Customer (Free)"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50"
-                      readonly
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Location Preference</label
-                    >
-                    <select
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                    >
-                      <option value="">Set your location</option>
-                      <option>Within 1 mile</option>
-                      <option>Within 5 miles</option>
-                      <option>Within 10 miles</option>
-                      <option>City-wide</option>
-                      <option>Show all businesses</option>
-                    </select>
-                  </div>
-                  <button
-                    class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                  >
-                    Save Preferences
-                  </button>
-                </div>
-              </div>
-              <!-- Notifications & Privacy -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">
-                  Notifications & Privacy
-                </h3>
-                <div class="space-y-4">
-                  <!-- New Businesses Notification -->
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Notify me about newly added nearby businesses</label
-                    >
-                    <div
-                      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div>
-                        <p class="text-sm text-gray-600">
-                          Get notified when new businesses join BusinessMonkey
-                          near your location
-                        </p>
-                      </div>
-                      <label
-                        class="relative inline-flex items-center cursor-pointer"
-                      >
-                        <input type="checkbox" class="sr-only peer" />
-                        <div
-                          class="toggle-bg w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"
-                        >
-                          <div
-                            class="toggle-circle w-4 h-4 bg-white rounded-full"
-                          ></div>
-                        </div>
-                      </label>
+
+          <!-- Notifications & Privacy -->
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-3">Notifications & Privacy</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 mb-1 text-sm">Notify me about newly added nearby businesses</label>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <p class="text-sm text-gray-600">Get notified when new businesses join BusinessMonkey near your location</p>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" />
+                    <div class="toggle-bg w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
+                      <div class="toggle-circle w-4 h-4 bg-white rounded-full"></div>
                     </div>
-                  </div>
-                  <!-- Other Notification Preferences -->
-                  <div>
-                    <h4 class="font-medium text-sm mb-2">
-                      Other Notifications
-                    </h4>
-                    <div class="space-y-2">
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-messages-cust"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label
-                          for="notif-messages-cust"
-                          class="text-gray-700 text-sm"
-                          >New messages from businesses</label
-                        >
-                      </div>
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-coupons"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label for="notif-coupons" class="text-gray-700 text-sm"
-                          >Special coupons and offers</label
-                        >
-                      </div>
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-updates"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label for="notif-updates" class="text-gray-700 text-sm"
-                          >Business updates and announcements</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Privacy Settings -->
-                  <div>
-                    <h4 class="font-medium text-sm mb-2">Privacy</h4>
-                    <div
-                      class="bg-blue-50 p-3 rounded-lg border border-blue-200"
-                    >
-                      <p class="text-xs text-blue-800 mb-2">
-                        <i class="fas fa-info-circle mr-1 text-xs"></i> Your
-                        privacy matters. We never sell your personal
-                        information.
-                      </p>
-                      <div class="space-y-1.5">
-                        <div class="flex items-start">
-                          <input
-                            type="checkbox"
-                            id="share-location"
-                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <label
-                            for="share-location"
-                            class="text-gray-700 text-xs"
-                            >Share approximate location to discover nearby
-                            businesses</label
-                          >
-                        </div>
-                        <div class="flex items-start">
-                          <input
-                            type="checkbox"
-                            id="public-profile"
-                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <label
-                            for="public-profile"
-                            class="text-gray-700 text-xs"
-                            >Make my profile visible to businesses I
-                            contact</label
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    class="mt-3 w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 transition-colors text-sm"
-                  >
-                    Save Notification Settings
-                  </button>
+                  </label>
                 </div>
               </div>
             </div>
@@ -488,136 +237,75 @@
         </div>
       </div>
     </div>
+
+    <!-- Scripts -->
     <script>
-      // Tab switching functionality
-      function showCatalog() {
-        document.getElementById("catalog-content").classList.remove("hidden");
-        document
-          .getElementById("customer-messages-content")
-          .classList.add("hidden");
-        document
-          .getElementById("customer-account-content")
-          .classList.add("hidden");
-        document
-          .getElementById("tab-catalog")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-catalog")
-          .classList.remove("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-      }
+      let businesses = [
+        {name: "Sunrise Cafe", type: "Food & Beverage", location: "Downtown"},
+        {name: "Green Thumb Garden", type: "Home & Garden", location: "Uptown"},
+        {name: "Zen Spa", type: "Beauty & Wellness", location: "Midtown"},
+        {name: "Techie Retail", type: "Retail", location: "Downtown"},
+        {name: "Crafty Corner", type: "Arts & Crafts", location: "Uptown"},
+        {name: "Handy Services", type: "Services", location: "Midtown"}
+      ];
 
-      function showCustomerMessages() {
-        document.getElementById("catalog-content").classList.add("hidden");
-        document
-          .getElementById("customer-messages-content")
-          .classList.remove("hidden");
-        document
-          .getElementById("customer-account-content")
-          .classList.add("hidden");
-        document
-          .getElementById("tab-catalog")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-catalog")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-      }
+      let currentType = "";
 
-      function showCustomerAccount() {
-        document.getElementById("catalog-content").classList.add("hidden");
-        document
-          .getElementById("customer-messages-content")
-          .classList.add("hidden");
-        document
-          .getElementById("customer-account-content")
-          .classList.remove("hidden");
-        document
-          .getElementById("tab-catalog")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-catalog")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-transparent", "text-gray-500");
-      }
+      function switchTab(tab) {
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+        document.getElementById(tab).classList.remove("hidden");
 
-      // Business filtering functionality
-      function filterBusinesses() {
-        const searchTerm = document
-          .getElementById("search-input")
-          .value.toLowerCase();
-        // In a real app, this would filter businesses from a database
-        // For now, we'll keep the empty state since there are no businesses
-      }
-
-      function filterByType(type) {
-        // Update button styles
-        document.querySelectorAll("#catalog-content button").forEach((btn) => {
-          btn.classList.remove("bg-indigo-600", "text-white");
-          btn.classList.add("bg-gray-200", "text-gray-700");
+        document.querySelectorAll("nav button").forEach(b => {
+          b.classList.remove("border-indigo-500", "text-indigo-600");
+          b.classList.add("border-transparent", "text-gray-500");
         });
-        if (type === "") {
-          document
-            .getElementById("all-types-btn")
-            .classList.remove("bg-gray-200", "text-gray-700");
-          document
-            .getElementById("all-types-btn")
-            .classList.add("bg-indigo-600", "text-white");
-        } else {
-          const btnId = type.replace(/ & /g, "-").toLowerCase() + "-btn";
-          const btn = document.getElementById(btnId);
-          if (btn) {
-            btn.classList.remove("bg-gray-200", "text-gray-700");
-            btn.classList.add("bg-indigo-600", "text-white");
-          }
-        }
-        // In a real app, this would filter businesses by type
+
+        document.getElementById(`tab-${tab}`).classList.add("border-indigo-500", "text-indigo-600");
+        document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-gray-500");
       }
 
-      // Logout function
+      function renderBusinesses() {
+        const grid = document.getElementById("businesses-grid");
+        const search = document.getElementById("search-input").value.toLowerCase();
+        let filtered = businesses.filter(b => 
+          (b.name.toLowerCase().includes(search) || b.type.toLowerCase().includes(search) || b.location.toLowerCase().includes(search)) &&
+          (currentType === "" || b.type === currentType)
+        );
+        grid.innerHTML = "";
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-store"></i>
+              <p class="text-3xl font-bold text-gray-700 mb-4">No businesses found</p>
+              <p class="text-xl text-gray-500 max-w-2xl">Start exploring local businesses in your area.</p>
+            </div>`;
+          return;
+        }
+        filtered.forEach(b => {
+          grid.innerHTML += `
+            <div class="bg-white p-4 rounded-xl shadow-md business-card">
+              <h3 class="text-lg font-semibold mb-1">${b.name}</h3>
+              <p class="text-sm text-gray-500">${b.type} - ${b.location}</p>
+            </div>`;
+        });
+      }
+
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("bg-indigo-600", "text-white"));
+          btn.classList.add("bg-indigo-600", "text-white");
+          currentType = btn.dataset.type;
+          renderBusinesses();
+        });
+      });
+
       function logout() {
-        if (confirm("Are you sure you want to log out?")) {
-          alert("You have been logged out successfully.");
-          // In a real app, this would redirect to login page
-          // window.location.href = "/login";
-        }
+        if (confirm("Are you sure you want to log out?")) alert("You have been logged out successfully.");
       }
 
-      // Initialize with catalog tab active
-      showCatalog();
+      // Initialize
+      switchTab("catalog");
+      renderBusinesses();
     </script>
   </body>
 </html>
