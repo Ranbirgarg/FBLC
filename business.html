@@ -1,964 +1,159 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BusinessMonkey - Business Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#4f46e5",
-              secondary: "#6366f1",
-              accent: "#f59e0b",
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      .business-card:hover {
-        transform: translateY(-5px);
-        box-shadow:
-          0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-      .stats-card {
-        transition: all 0.3s ease;
-      }
-      .stats-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      }
-      .bar-chart {
-        display: flex;
-        align-items: flex-end;
-        height: 150px;
-        gap: 6px;
-        padding: 15px;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-top: 0.5rem;
-      }
-      .bar {
-        flex: 1;
-        background: linear-gradient(to top, #e5e7eb, #f3f4f6);
-        border-radius: 4px 4px 0 0;
-        position: relative;
-        transition: all 0.3s ease;
-        min-height: 4px;
-      }
-      .bar-label {
-        position: absolute;
-        bottom: -20px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        font-size: 0.65rem;
-        color: #6b7280;
-      }
-      .toggle-bg {
-        background-color: #d1d5db;
-      }
-      .toggle-circle {
-        background-color: white;
-      }
-      .toggle-active .toggle-bg {
-        background-color: #4f46e5;
-      }
-      .toggle-active .toggle-circle {
-        transform: translateX(100%);
-        background-color: white;
-      }
-      .chat-bubble {
-        max-width: 70%;
-        padding: 8px 12px;
-        border-radius: 18px;
-        margin-bottom: 10px;
-        position: relative;
-        line-height: 1.4;
-        font-size: 0.9rem;
-      }
-      .chat-bubble.business {
-        background-color: #4f46e5;
-        color: white;
-        align-self: flex-end;
-        border-bottom-right-radius: 4px;
-      }
-      .chat-bubble.customer {
-        background-color: #f3f4f6;
-        color: #374151;
-        align-self: flex-start;
-        border-bottom-left-radius: 4px;
-      }
-      .chat-contact.active {
-        background-color: #4f46e5;
-        color: white;
-      }
-      .chat-contact:hover:not(.active) {
-        background-color: #f3f4f6;
-      }
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        text-align: center;
-        color: #6b7280;
-      }
-      .empty-state i {
-        font-size: 2.5rem;
-        margin-bottom: 0.75rem;
-        opacity: 0.5;
-      }
-      .chat-container {
-        height: calc(100vh - 240px);
-      }
-      @media (max-width: 768px) {
-        .chat-container {
-          height: calc(100vh - 280px);
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+// ====== 1. Initialize Firebase ======
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ====== 2. Tab Switching ======
+function showBusinessHome() {
+    document.getElementById("business-home-content").classList.remove("hidden");
+    document.getElementById("coupon-maker-content").classList.add("hidden");
+    document.getElementById("business-messages-content").classList.add("hidden");
+    document.getElementById("business-account-content").classList.add("hidden");
+    updateTabStyles("tab-dashboard");
+}
+function showCouponMaker() {
+    document.getElementById("business-home-content").classList.add("hidden");
+    document.getElementById("coupon-maker-content").classList.remove("hidden");
+    document.getElementById("business-messages-content").classList.add("hidden");
+    document.getElementById("business-account-content").classList.add("hidden");
+    updateTabStyles("tab-coupons");
+}
+function showBusinessMessages() {
+    document.getElementById("business-home-content").classList.add("hidden");
+    document.getElementById("coupon-maker-content").classList.add("hidden");
+    document.getElementById("business-messages-content").classList.remove("hidden");
+    document.getElementById("business-account-content").classList.add("hidden");
+    updateTabStyles("tab-messages");
+}
+function showBusinessAccount() {
+    document.getElementById("business-home-content").classList.add("hidden");
+    document.getElementById("coupon-maker-content").classList.add("hidden");
+    document.getElementById("business-messages-content").classList.add("hidden");
+    document.getElementById("business-account-content").classList.remove("hidden");
+    updateTabStyles("tab-settings");
+}
+function updateTabStyles(activeId) {
+    ["tab-dashboard","tab-coupons","tab-messages","tab-settings"].forEach(id=>{
+        const el = document.getElementById(id);
+        if(id===activeId){
+            el.classList.add("border-indigo-500","text-indigo-600");
+            el.classList.remove("border-transparent","text-gray-500");
+        } else {
+            el.classList.remove("border-indigo-500","text-indigo-600");
+            el.classList.add("border-transparent","text-gray-500");
         }
-      }
-    </style>
-  </head>
-  <body class="bg-gray-50 min-h-screen">
-    <!-- Business Dashboard -->
-    <div id="business-dashboard" class="min-h-screen flex flex-col">
-      <!-- Business Header -->
-      <header class="bg-white shadow-sm">
-        <div
-          class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center"
-        >
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
-            >
-              <i class="fas fa-monkey text-white text-lg"></i>
+    });
+}
+
+// ====== 3. Create Coupon ======
+function createCoupon(e) {
+    e.preventDefault();
+    const code = document.getElementById("coupon-code").value.trim();
+    const discount = document.getElementById("coupon-discount").value.trim();
+    const expires = document.getElementById("coupon-expires").value;
+    if(!code || !discount || !expires) return alert("Fill all fields!");
+
+    const expiryDate = new Date(expires);
+    const formattedDate = expiryDate.toLocaleDateString("en-US", {
+        year:"numeric", month:"short", day:"numeric"
+    });
+
+    db.collection("coupons").add({
+        code: code.toUpperCase(),
+        discount,
+        expires: expiryDate,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        alert(`Coupon "${code}" created successfully!`);
+        const couponsList = document.getElementById("business-coupons-list");
+        const emptyState = couponsList.querySelector(".empty-state");
+        if(emptyState) emptyState.remove();
+
+        const newCoupon = document.createElement("div");
+        newCoupon.className = "flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200";
+        newCoupon.innerHTML = `
+            <div>
+                <p class="font-bold text-indigo-700 text-sm">${code.toUpperCase()}</p>
+                <p class="text-gray-700 text-xs">${discount}</p>
             </div>
-            <h1 class="text-xl font-bold text-gray-800">
-              Business<span class="text-amber-600">Monkey</span> Dashboard
-            </h1>
-          </div>
-          <button
-            onclick="logout()"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <i class="fas fa-sign-out-alt mr-2"></i>Logout
-          </button>
-        </div>
-      </header>
-      <!-- Business Navigation -->
-      <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="flex space-x-8 border-b border-gray-200">
-            <button
-              onclick="showBusinessHome()"
-              id="tab-dashboard"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 flex items-center"
-            >
-              <i class="fas fa-home mr-2"></i> Dashboard
-            </button>
-            <button
-              onclick="showCouponMaker()"
-              id="tab-coupons"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
-            >
-              <i class="fas fa-tags mr-2"></i> Coupons
-            </button>
-            <button
-              onclick="showBusinessMessages()"
-              id="tab-messages"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
-            >
-              <i class="fas fa-comment-dots mr-2"></i> Messages
-            </button>
-            <button
-              onclick="showBusinessAccount()"
-              id="tab-settings"
-              class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center"
-            >
-              <i class="fas fa-cog mr-2"></i> Settings
-            </button>
-          </div>
-        </div>
-      </nav>
-      <!-- Main Content Area -->
-      <div class="flex-1 overflow-auto">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-          <!-- Business Home Content (Dashboard) -->
-          <div id="business-home-content">
-            <h2 class="text-xl font-bold mb-4">Business Analytics</h2>
-            <div class="grid md:grid-cols-2 gap-4 mb-6">
-              <div class="bg-white p-4 rounded-xl shadow-md stats-card">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-gray-600 mb-1 text-sm">Total Views</p>
-                    <p class="text-2xl font-bold text-indigo-600">0</p>
-                    <p class="text-gray-500 text-xs mt-1">No views yet</p>
-                  </div>
-                  <i class="fas fa-eye text-indigo-100 text-2xl"></i>
-                </div>
-              </div>
-              <div class="bg-white p-4 rounded-xl shadow-md stats-card">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-gray-600 mb-1 text-sm">Customer Rating</p>
-                    <p class="text-2xl font-bold text-yellow-600">0.0/5.0</p>
-                    <p class="text-gray-500 text-xs mt-1">0 reviews</p>
-                  </div>
-                  <i class="fas fa-star text-yellow-100 text-2xl"></i>
-                </div>
-              </div>
-            </div>
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-              <!-- Weekly Views Chart -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">Weekly Views</h3>
-                <div class="bar-chart">
-                  <div class="bar" style="height: 0%" title="Monday: 0">
-                    <div class="bar-label">Mon</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Tuesday: 0">
-                    <div class="bar-label">Tue</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Wednesday: 0">
-                    <div class="bar-label">Wed</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Thursday: 0">
-                    <div class="bar-label">Thu</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Friday: 0">
-                    <div class="bar-label">Fri</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Saturday: 0">
-                    <div class="bar-label">Sat</div>
-                  </div>
-                  <div class="bar" style="height: 0%" title="Sunday: 0">
-                    <div class="bar-label">Sun</div>
-                  </div>
-                </div>
-                <div class="mt-3 flex justify-between text-xs text-gray-600">
-                  <span
-                    ><i class="fas fa-circle text-gray-400 mr-1"></i>
-                    Views</span
-                  >
-                  <span>Total: 0</span>
-                </div>
-                <div class="mt-3 text-center text-gray-500 text-xs">
-                  No view data available yet
-                </div>
-              </div>
-              <!-- Customer Demographics -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">
-                  Customer Demographics
-                </h3>
-                <div class="space-y-3">
-                  <div>
-                    <div class="flex justify-between mb-1">
-                      <span class="text-gray-700 text-xs"
-                        >Returning Customers</span
-                      >
-                      <span class="font-semibold text-xs">0%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        class="bg-indigo-600 h-2 rounded-full"
-                        style="width: 0%"
-                      ></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between mb-1">
-                      <span class="text-gray-700 text-xs">New Customers</span>
-                      <span class="font-semibold text-xs">0%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        class="bg-amber-500 h-2 rounded-full"
-                        style="width: 0%"
-                      ></div>
-                    </div>
-                  </div>
-                  <div class="mt-4">
-                    <h4 class="font-semibold text-sm mb-2">
-                      Top Customer Locations
-                    </h4>
-                    <div class="text-center py-4 text-gray-500 text-xs">
-                      No location data available
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Recent Activity -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-              <h3 class="text-lg font-semibold p-4 pb-3">Recent Activity</h3>
-              <div class="divide-y divide-gray-200 max-h-80 overflow-y-auto">
-                <div class="empty-state py-6">
-                  <i class="fas fa-history"></i>
-                  <p class="text-base font-medium">No recent activity</p>
-                  <p class="mt-1 text-sm">
-                    Your business activity will appear here once you start
-                    receiving orders, messages, and reviews
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Coupon Maker Content -->
-          <div id="coupon-maker-content" class="hidden">
-            <h2 class="text-xl font-bold mb-4">Manage Coupons</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- Create Coupon Form -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">Create New Coupon</h3>
-                <form onsubmit="createCoupon(event)">
-                  <div class="mb-3">
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Coupon Code</label
-                    >
-                    <input
-                      type="text"
-                      id="coupon-code"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="WELCOME10"
-                      required
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Discount Description</label
-                    >
-                    <textarea
-                      id="coupon-discount"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="10% off your first purchase"
-                      rows="2"
-                      required
-                    ></textarea>
-                  </div>
-                  <div class="mb-4">
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Expiration Date</label
-                    >
-                    <input
-                      type="date"
-                      id="coupon-expires"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    class="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center space-x-2 font-medium text-sm"
-                  >
-                    <i class="fas fa-plus mr-1"></i>
-                    <span>Create Coupon</span>
-                  </button>
-                </form>
-                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <h4 class="font-semibold text-blue-800 mb-1 text-xs">
-                    Coupon Tips
-                  </h4>
-                  <ul class="text-blue-700 space-y-0.5 text-xs">
-                    <li>
-                      <i class="fas fa-check-circle text-green-500 mr-1"></i
-                      >Create urgency with limited-time offers
-                    </li>
-                    <li>
-                      <i class="fas fa-check-circle text-green-500 mr-1"></i>Use
-                      clear, benefit-focused descriptions
-                    </li>
-                    <li>
-                      <i class="fas fa-check-circle text-green-500 mr-1"></i
-                      >Track redemption rates in your analytics
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <!-- Active Coupons List -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">Active Coupons</h3>
-                <div
-                  id="business-coupons-list"
-                  class="space-y-2 max-h-80 overflow-y-auto"
-                >
-                  <div class="empty-state py-8">
-                    <i class="fas fa-tag"></i>
-                    <p class="text-base font-medium">No active coupons</p>
-                    <p class="mt-1 text-sm">
-                      Create your first coupon to attract new customers and
-                      reward loyal ones
-                    </p>
-                    <button
-                      onclick="document.getElementById('coupon-code').focus()"
-                      class="mt-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors text-xs"
-                    >
-                      Create Your First Coupon
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Business Messages Content -->
-          <div id="business-messages-content" class="hidden">
-            <h2 class="text-xl font-bold mb-4">Messages</h2>
-            <div
-              class="bg-white rounded-xl shadow-md overflow-hidden chat-container"
-            >
-              <div class="grid md:grid-cols-3 h-full">
-                <!-- Conversations List -->
-                <div class="border-r border-gray-200 overflow-y-auto">
-                  <div class="p-3 border-b border-gray-200">
-                    <h3 class="font-semibold text-sm">Conversations</h3>
-                  </div>
-                  <div id="conversations-list" class="empty-state py-8">
-                    <i class="fas fa-comments"></i>
-                    <p class="text-base font-medium">No conversations yet</p>
-                    <p class="mt-1 text-sm">
-                      Conversations with customers and other businesses will
-                      appear here
-                    </p>
-                  </div>
-                </div>
-                <!-- Chat Area -->
-                <div class="md:col-span-2 flex flex-col">
-                  <div class="p-3 border-b border-gray-200">
-                    <h3 class="font-semibold text-sm">Messages</h3>
-                  </div>
-                  <div
-                    id="chat-messages"
-                    class="flex-1 p-3 overflow-y-auto flex items-center justify-center bg-gray-50"
-                  >
-                    <div class="text-center text-gray-500">
-                      <i
-                        class="fas fa-comment-dots text-3xl mb-3 opacity-50"
-                      ></i>
-                      <p class="text-base font-medium">
-                        No conversation selected
-                      </p>
-                      <p class="mt-1 text-sm">
-                        Select a conversation from the list to start chatting
-                      </p>
-                    </div>
-                  </div>
-                  <div class="p-3 border-t border-gray-200">
-                    <div class="flex space-x-2">
-                      <input
-                        type="text"
-                        id="business-message-input"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-sm"
-                        placeholder="Select a conversation to start messaging..."
-                        disabled
-                      />
-                      <button
-                        class="bg-gray-400 text-white p-2 rounded-lg cursor-not-allowed"
-                      >
-                        <i class="fas fa-paper-plane text-sm"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="mt-1.5 flex justify-between text-xs text-gray-400"
-                    >
-                      <span>Messages are saved automatically</span>
-                      <span>Offline</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Business Account Content (Settings) -->
-          <div id="business-account-content" class="hidden">
-            <h2 class="text-xl font-bold mb-4">Account Settings</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- Business Information -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">Business Information</h3>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Business Name</label
-                    >
-                    <input
-                      type="text"
-                      value=""
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="Enter your business name"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Business Type</label
-                    >
-                    <select
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                    >
-                      <option value="">Select business type</option>
-                      <option>Food & Beverage</option>
-                      <option>Retail</option>
-                      <option>Services</option>
-                      <option>Beauty & Wellness</option>
-                      <option>Home & Garden</option>
-                      <option>Arts & Crafts</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Location</label
-                    >
-                    <input
-                      type="text"
-                      value=""
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="Enter your business address"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Business Hours</label
-                    >
-                    <div class="grid grid-cols-2 gap-2">
-                      <div>
-                        <select
-                          class="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm"
-                        >
-                          <option>Mon-Fri</option>
-                          <option>Saturday</option>
-                          <option>Sunday</option>
-                        </select>
-                      </div>
-                      <div class="flex space-x-1">
-                        <input
-                          type="time"
-                          value=""
-                          class="w-1/2 px-2 py-2 border border-gray-300 rounded-lg text-sm"
-                          placeholder="09:00"
-                        />
-                        <span class="self-center text-sm">to</span>
-                        <input
-                          type="time"
-                          value=""
-                          class="w-1/2 px-2 py-2 border border-gray-300 rounded-lg text-sm"
-                          placeholder="17:00"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Contact Email</label
-                    >
-                    <input
-                      type="email"
-                      value=""
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="business@email.com"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Phone Number</label
-                    >
-                    <input
-                      type="tel"
-                      value=""
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                  <button
-                    class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-              <!-- Privacy & Preferences -->
-              <div class="bg-white p-4 rounded-xl shadow-md">
-                <h3 class="text-lg font-semibold mb-3">
-                  Privacy & Preferences
-                </h3>
-                <div class="space-y-4">
-                  <!-- Visibility Toggle -->
-                  <div>
-                    <label class="block text-gray-700 mb-1 text-sm"
-                      >Business Visibility</label
-                    >
-                    <div
-                      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div>
-                        <h4 class="font-medium text-sm">
-                          Make my business public
-                        </h4>
-                        <p class="text-xs text-gray-500">
-                          Allow customers to find and contact your business
-                        </p>
-                      </div>
-                      <label
-                        class="relative inline-flex items-center cursor-pointer"
-                      >
-                        <input type="checkbox" class="sr-only peer" />
-                        <div
-                          class="toggle-bg w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"
-                        >
-                          <div
-                            class="toggle-circle w-4 h-4 bg-white rounded-full"
-                          ></div>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                  <!-- Notification Preferences -->
-                  <div>
-                    <h4 class="font-medium text-sm mb-2">
-                      Notification Preferences
-                    </h4>
-                    <div class="space-y-2">
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-orders"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label for="notif-orders" class="text-gray-700 text-sm"
-                          >New orders and sales</label
-                        >
-                      </div>
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-messages"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label
-                          for="notif-messages"
-                          class="text-gray-700 text-sm"
-                          >New customer messages</label
-                        >
-                      </div>
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-reviews"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label for="notif-reviews" class="text-gray-700 text-sm"
-                          >New reviews and ratings</label
-                        >
-                      </div>
-                      <div class="flex items-start">
-                        <input
-                          type="checkbox"
-                          id="notif-promos"
-                          class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                        />
-                        <label for="notif-promos" class="text-gray-700 text-sm"
-                          >Promotional offers from BusinessMonkey</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Data Sharing -->
-                  <div>
-                    <h4 class="font-medium text-sm mb-2">
-                      Data Sharing Preferences
-                    </h4>
-                    <div
-                      class="bg-blue-50 p-3 rounded-lg border border-blue-200"
-                    >
-                      <p class="text-xs text-blue-800 mb-2">
-                        <i class="fas fa-info-circle mr-1 text-xs"></i> We never
-                        sell your customer data. These settings control how we
-                        use anonymized data to improve our service.
-                      </p>
-                      <div class="space-y-1.5">
-                        <div class="flex items-start">
-                          <input
-                            type="checkbox"
-                            id="share-analytics"
-                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <label
-                            for="share-analytics"
-                            class="text-gray-700 text-xs"
-                            >Share anonymized sales data for industry
-                            benchmarking</label
-                          >
-                        </div>
-                        <div class="flex items-start">
-                          <input
-                            type="checkbox"
-                            id="share-reviews"
-                            class="mt-0.5 mr-1.5 h-3.5 w-3.5 text-indigo-600 rounded focus:ring-indigo-500"
-                          />
-                          <label
-                            for="share-reviews"
-                            class="text-gray-700 text-xs"
-                            >Allow reviews to appear in BusinessMonkey discovery
-                            features</label
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Subscription Status -->
-                  <div>
-                    <h4 class="font-medium text-sm mb-2">Subscription</h4>
-                    <div
-                      class="p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <p class="text-gray-700 font-semibold text-sm">
-                        <i
-                          class="fas fa-info-circle mr-1 text-gray-400 text-xs"
-                        ></i>
-                        No active subscription
-                      </p>
-                      <p class="text-xs text-gray-500 mt-1">
-                        Subscribe to access premium features like coupons,
-                        analytics, and customer messaging
-                      </p>
-                      <button
-                        class="mt-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 transition-colors text-xs"
-                      >
-                        Start $2.99/month Subscription
-                      </button>
-                    </div>
-                  </div>
-                  <button
-                    class="mt-3 w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 transition-colors text-sm"
-                  >
-                    Save Privacy Settings
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-      // Tab switching functionality
-      function showBusinessHome() {
-        document
-          .getElementById("business-home-content")
-          .classList.remove("hidden");
-        document.getElementById("coupon-maker-content").classList.add("hidden");
-        document
-          .getElementById("business-messages-content")
-          .classList.add("hidden");
-        document
-          .getElementById("business-account-content")
-          .classList.add("hidden");
-        document
-          .getElementById("tab-dashboard")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-dashboard")
-          .classList.remove("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-coupons")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-coupons")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-      }
-      function showCouponMaker() {
-        document
-          .getElementById("business-home-content")
-          .classList.add("hidden");
-        document
-          .getElementById("coupon-maker-content")
-          .classList.remove("hidden");
-        document
-          .getElementById("business-messages-content")
-          .classList.add("hidden");
-        document
-          .getElementById("business-account-content")
-          .classList.add("hidden");
-        document
-          .getElementById("tab-dashboard")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-dashboard")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-coupons")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-coupons")
-          .classList.remove("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-      }
-      function showBusinessMessages() {
-        document
-          .getElementById("business-home-content")
-          .classList.add("hidden");
-        document.getElementById("coupon-maker-content").classList.add("hidden");
-        document
-          .getElementById("business-messages-content")
-          .classList.remove("hidden");
-        document
-          .getElementById("business-account-content")
-          .classList.add("hidden");
-        document
-          .getElementById("tab-dashboard")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-dashboard")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-coupons")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-coupons")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-      }
-      function showBusinessAccount() {
-        document
-          .getElementById("business-home-content")
-          .classList.add("hidden");
-        document.getElementById("coupon-maker-content").classList.add("hidden");
-        document
-          .getElementById("business-messages-content")
-          .classList.add("hidden");
-        document
-          .getElementById("business-account-content")
-          .classList.remove("hidden");
-        document
-          .getElementById("tab-dashboard")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-dashboard")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-coupons")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-coupons")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-messages")
-          .classList.add("border-transparent", "text-gray-500");
-        document
-          .getElementById("tab-messages")
-          .classList.remove("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.add("border-indigo-500", "text-indigo-600");
-        document
-          .getElementById("tab-settings")
-          .classList.remove("border-transparent", "text-gray-500");
-      }
-      // Coupon creation functionality
-      function createCoupon(e) {
-        e.preventDefault();
-        const code = document.getElementById("coupon-code").value;
-        const discount = document.getElementById("coupon-discount").value;
-        const expires = document.getElementById("coupon-expires").value;
-        if (code && discount && expires) {
-          const couponsList = document.getElementById("business-coupons-list");
-          const expiryDate = new Date(expires);
-          const formattedDate = expiryDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          });
-          const newCoupon = document.createElement("div");
-          newCoupon.className =
-            "flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200";
-          newCoupon.innerHTML = `
-<div>
-<p class="font-bold text-indigo-700 text-sm">${code.toUpperCase()}</p>
-<p class="text-gray-700 text-xs">${discount}</p>
-</div>
-<div class="text-right">
-<p class="text-xs text-gray-500">Expires: ${formattedDate}</p>
-<p class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mt-0.5">0 redemptions</p>
-</div>
-`;
-          // Clear empty state if exists
-          const emptyState = couponsList.querySelector(".empty-state");
-          if (emptyState) {
-            emptyState.remove();
-          }
-          couponsList.appendChild(newCoupon);
-          // Reset form
-          document.getElementById("coupon-code").value = "";
-          document.getElementById("coupon-discount").value = "";
-          document.getElementById("coupon-expires").value = "";
-          // Show success message
-          alert(`Coupon "${code}" created successfully!`);
-        }
-      }
-      // Chat functionality
-      function sendBusinessMessage() {
-        const messageInput = document.getElementById("business-message-input");
-        const message = messageInput.value.trim();
-        if (message) {
-          const chatMessages = document.getElementById("chat-messages");
-          const newMessage = document.createElement("div");
-          newMessage.className = "chat-bubble business";
-          newMessage.textContent = message;
-          chatMessages.appendChild(newMessage);
-          messageInput.value = "";
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-      }
-      // Logout function
-      function logout() {
-        if (confirm("Are you sure you want to log out?")) {
-          alert("You have been logged out successfully.");
-          // In a real app, this would redirect to login page
-        }
-      }
-      // Initialize with dashboard tab active
-      showBusinessHome();
-    </script>
-  </body>
-</html>
+            <div class="text-right">
+                <p class="text-xs text-gray-500">Expires: ${formattedDate}</p>
+                <p class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mt-0.5">0 redemptions</p>
+            </div>`;
+        couponsList.appendChild(newCoupon);
+
+        // Reset form
+        document.getElementById("coupon-code").value="";
+        document.getElementById("coupon-discount").value="";
+        document.getElementById("coupon-expires").value="";
+    })
+    .catch(err => {
+        console.error("Error creating coupon:", err);
+        alert("Failed to create coupon.");
+    });
+}
+
+// ====== 4. Send Business Message ======
+function sendBusinessMessage() {
+    const input = document.getElementById("business-message-input");
+    const message = input.value.trim();
+    if(!message) return;
+    const chatMessages = document.getElementById("chat-messages");
+    const newMessage = document.createElement("div");
+    newMessage.className="chat-bubble business";
+    newMessage.textContent = message;
+    chatMessages.appendChild(newMessage);
+    input.value="";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// ====== 5. Save Business Account Info ======
+document.querySelector("#business-account-content button").addEventListener("click", () => {
+    const name = document.querySelector('#business-account-content input[placeholder="Enter your business name"]').value;
+    const type = document.querySelector('#business-account-content select').value;
+    const location = document.querySelector('#business-account-content input[placeholder="Enter your business address"]').value;
+
+    if(!name || !type || !location) return alert("Fill all required fields!");
+
+    db.collection("businesses").add({
+        name,
+        type,
+        location,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(()=> alert("Business info saved!"))
+    .catch(err => {
+        console.error("Error saving business info:", err);
+        alert("Error saving business info.");
+    });
+});
+
+// ====== 6. Dashboard Stats (Example) ======
+function updateDashboardStats() {
+    db.collection("businesses").get()
+    .then(snapshot => {
+        document.querySelector(".stats-card p.text-2xl").textContent = snapshot.size;
+    })
+    .catch(err => console.error(err));
+}
+
+// ====== 7. Logout ======
+function logout() {
+    if(confirm("Are you sure you want to log out?")) alert("Logged out!");
+}
+
+// ====== 8. Initialize ======
+showBusinessHome();
+updateDashboardStats();
+</script>
