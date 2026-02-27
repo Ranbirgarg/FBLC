@@ -1,311 +1,151 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BusinessMonkey - Customer Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#4f46e5",
-              secondary: "#6366f1",
-              accent: "#f59e0b",
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      /* Hover effects */
-      .business-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-      .chat-bubble {
-        max-width: 70%;
-        padding: 8px 12px;
-        border-radius: 18px;
-        margin-bottom: 10px;
-        line-height: 1.4;
-        font-size: 0.9rem;
-      }
-      .chat-bubble.business {
-        background-color: #4f46e5;
-        color: white;
-        align-self: flex-end;
-        border-bottom-right-radius: 4px;
-      }
-      .chat-bubble.customer {
-        background-color: #f3f4f6;
-        color: #374151;
-        align-self: flex-start;
-        border-bottom-left-radius: 4px;
-      }
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 4rem 2rem;
-        text-align: center;
-        color: #6b7280;
-        min-height: 300px;
-      }
-      .toggle-bg {
-        background-color: #d1d5db;
-      }
-      .toggle-circle {
-        background-color: white;
-      }
-      .toggle-active .toggle-bg {
-        background-color: #4f46e5;
-      }
-      .toggle-active .toggle-circle {
-        transform: translateX(100%);
-        background-color: white;
-      }
-    </style>
-  </head>
-  <body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-            <i class="fas fa-monkey text-white text-lg"></i>
-          </div>
-          <h1 class="text-xl font-bold text-gray-800">
-            Business<span class="text-amber-600">Monkey</span>
-          </h1>
-        </div>
-        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-          <i class="fas fa-sign-out-alt mr-2"></i>Logout
-        </button>
-      </div>
-    </header>
+<script type="module">
+  // Firebase imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, where, addDoc, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
 
-    <!-- Navigation Tabs -->
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex space-x-8 border-b border-gray-200">
-          <button onclick="switchTab('catalog')" id="tab-catalog" class="py-4 px-2 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600 flex items-center">
-            <i class="fas fa-search mr-2"></i> Catalog
-          </button>
-          <button onclick="switchTab('messages')" id="tab-messages" class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center">
-            <i class="fas fa-comment-dots mr-2"></i> Messages
-          </button>
-          <button onclick="switchTab('account')" id="tab-settings" class="py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center">
-            <i class="fas fa-user mr-2"></i> Settings
-          </button>
-        </div>
-      </div>
-    </nav>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-    <!-- Main Content -->
-    <div class="flex-1 overflow-auto max-w-7xl mx-auto px-4 py-4">
-      <!-- Catalog Tab -->
-      <div id="catalog" class="tab-content">
-        <div class="mb-6">
-          <div class="relative">
-            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-            <input
-              type="text"
-              id="search-input"
-              oninput="renderBusinesses()"
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-              placeholder="Search businesses by name, type, or location..."
-            />
-          </div>
-          <div class="mt-4 flex flex-wrap gap-2" id="filter-buttons">
-            <button data-type="" class="filter-btn px-3 py-1 rounded-full text-sm bg-indigo-600 text-white">All Types</button>
-            <button data-type="Food & Beverage" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Food & Beverage</button>
-            <button data-type="Retail" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Retail</button>
-            <button data-type="Services" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Services</button>
-            <button data-type="Beauty & Wellness" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Beauty & Wellness</button>
-            <button data-type="Home & Garden" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Home & Garden</button>
-            <button data-type="Arts & Crafts" class="filter-btn px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">Arts & Crafts</button>
-          </div>
-        </div>
-        <div id="businesses-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div class="empty-state">
-            <i class="fas fa-store"></i>
-            <p class="text-3xl font-bold text-gray-700 mb-4">No businesses found</p>
-            <p class="text-xl text-gray-500 max-w-2xl">Start exploring local businesses in your area. As business owners join BusinessMonkey, they'll appear here.</p>
-          </div>
-        </div>
-      </div>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-      <!-- Messages Tab -->
-      <div id="messages" class="tab-content hidden">
-        <h2 class="text-xl font-bold mb-4">Messages</h2>
-        <div class="bg-white rounded-xl shadow-md overflow-hidden" style="height: calc(100vh - 240px)">
-          <div class="grid md:grid-cols-3 h-full">
-            <div class="border-r border-gray-200 overflow-y-auto">
-              <div class="p-3 border-b border-gray-200">
-                <h3 class="font-semibold text-sm">Businesses</h3>
-              </div>
-              <div id="conversations-list" class="empty-state py-8">
-                <i class="fas fa-comments"></i>
-                <p class="text-base font-medium">No conversations yet</p>
-                <p class="mt-1 text-sm">Start a conversation by contacting a business from the catalog</p>
-              </div>
-            </div>
-            <div class="md:col-span-2 flex flex-col">
-              <div class="p-3 border-b border-gray-200">
-                <h3 class="font-semibold text-sm" id="chat-business-name">Select a business to chat</h3>
-              </div>
-              <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex items-center justify-center bg-gray-50">
-                <div class="text-center text-gray-500">
-                  <i class="fas fa-comment-dots text-3xl mb-3 opacity-50"></i>
-                  <p class="text-base font-medium">No conversation selected</p>
-                  <p class="mt-1 text-sm">Select a business from the list to start chatting</p>
-                </div>
-              </div>
-              <div class="p-3 border-t border-gray-200">
-                <div class="flex space-x-2">
-                  <input type="text" id="customer-message-input" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-sm" placeholder="Select a business to start messaging..." disabled />
-                  <button class="bg-gray-400 text-white p-2 rounded-lg cursor-not-allowed">
-                    <i class="fas fa-paper-plane text-sm"></i>
-                  </button>
-                </div>
-                <div class="mt-1.5 flex justify-between text-xs text-gray-400">
-                  <span>Messages are saved automatically</span>
-                  <span>Offline</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  // --- Businesses ---
+  let businesses = [];
+  let currentType = "";
 
-      <!-- Account Tab -->
-      <div id="account" class="tab-content hidden">
-        <h2 class="text-xl font-bold mb-4">Account Settings</h2>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h3 class="text-lg font-semibold mb-3">Account Information</h3>
-            <div class="space-y-3">
-              <div>
-                <label class="block text-gray-700 mb-1 text-sm">Email Address</label>
-                <input type="email" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50" placeholder="your@email.com" readonly />
-              </div>
-              <div>
-                <label class="block text-gray-700 mb-1 text-sm">Account Type</label>
-                <input type="text" value="Customer (Free)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-gray-50" readonly />
-              </div>
-              <div>
-                <label class="block text-gray-700 mb-1 text-sm">Location Preference</label>
-                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
-                  <option value="">Set your location</option>
-                  <option>Within 1 mile</option>
-                  <option>Within 5 miles</option>
-                  <option>Within 10 miles</option>
-                  <option>City-wide</option>
-                  <option>Show all businesses</option>
-                </select>
-              </div>
-              <button class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">Save Preferences</button>
-            </div>
-          </div>
+  async function fetchBusinesses() {
+    const colRef = collection(db, "businesses");
+    const snapshot = await getDocs(colRef);
+    businesses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderBusinesses();
+  }
 
-          <!-- Notifications & Privacy -->
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h3 class="text-lg font-semibold mb-3">Notifications & Privacy</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-gray-700 mb-1 text-sm">Notify me about newly added nearby businesses</label>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <p class="text-sm text-gray-600">Get notified when new businesses join BusinessMonkey near your location</p>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" />
-                    <div class="toggle-bg w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
-                      <div class="toggle-circle w-4 h-4 bg-white rounded-full"></div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  function renderBusinesses() {
+    const grid = document.getElementById("businesses-grid");
+    const search = document.getElementById("search-input").value.toLowerCase();
+    let filtered = businesses.filter(b => 
+      (b.name.toLowerCase().includes(search) || b.type.toLowerCase().includes(search) || b.location.toLowerCase().includes(search)) &&
+      (currentType === "" || b.type === currentType)
+    );
+    grid.innerHTML = "";
 
-    <!-- Scripts -->
-    <script>
-      let businesses = [
-        {name: "Sunrise Cafe", type: "Food & Beverage", location: "Downtown"},
-        {name: "Green Thumb Garden", type: "Home & Garden", location: "Uptown"},
-        {name: "Zen Spa", type: "Beauty & Wellness", location: "Midtown"},
-        {name: "Techie Retail", type: "Retail", location: "Downtown"},
-        {name: "Crafty Corner", type: "Arts & Crafts", location: "Uptown"},
-        {name: "Handy Services", type: "Services", location: "Midtown"}
-      ];
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-store"></i>
+          <p class="text-3xl font-bold text-gray-700 mb-4">No businesses found</p>
+          <p class="text-xl text-gray-500 max-w-2xl">Start exploring local businesses in your area.</p>
+        </div>`;
+      return;
+    }
 
-      let currentType = "";
+    filtered.forEach(b => {
+      const card = document.createElement("div");
+      card.className = "bg-white p-4 rounded-xl shadow-md business-card cursor-pointer";
+      card.innerHTML = `<h3 class="text-lg font-semibold mb-1">${b.name}</h3>
+                        <p class="text-sm text-gray-500">${b.type} - ${b.location}</p>`;
+      card.addEventListener("click", () => selectBusiness(b));
+      grid.appendChild(card);
+    });
+  }
 
-      function switchTab(tab) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
-        document.getElementById(tab).classList.remove("hidden");
-
-        document.querySelectorAll("nav button").forEach(b => {
-          b.classList.remove("border-indigo-500", "text-indigo-600");
-          b.classList.add("border-transparent", "text-gray-500");
-        });
-
-        document.getElementById(`tab-${tab}`).classList.add("border-indigo-500", "text-indigo-600");
-        document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-gray-500");
-      }
-
-      function renderBusinesses() {
-        const grid = document.getElementById("businesses-grid");
-        const search = document.getElementById("search-input").value.toLowerCase();
-        let filtered = businesses.filter(b => 
-          (b.name.toLowerCase().includes(search) || b.type.toLowerCase().includes(search) || b.location.toLowerCase().includes(search)) &&
-          (currentType === "" || b.type === currentType)
-        );
-        grid.innerHTML = "";
-        if (filtered.length === 0) {
-          grid.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-store"></i>
-              <p class="text-3xl font-bold text-gray-700 mb-4">No businesses found</p>
-              <p class="text-xl text-gray-500 max-w-2xl">Start exploring local businesses in your area.</p>
-            </div>`;
-          return;
-        }
-        filtered.forEach(b => {
-          grid.innerHTML += `
-            <div class="bg-white p-4 rounded-xl shadow-md business-card">
-              <h3 class="text-lg font-semibold mb-1">${b.name}</h3>
-              <p class="text-sm text-gray-500">${b.type} - ${b.location}</p>
-            </div>`;
-        });
-      }
-
-      document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("bg-indigo-600", "text-white"));
-          btn.classList.add("bg-indigo-600", "text-white");
-          currentType = btn.dataset.type;
-          renderBusinesses();
-        });
-      });
-
-      function logout() {
-        if (confirm("Are you sure you want to log out?")) alert("You have been logged out successfully.");
-      }
-
-      // Initialize
-      switchTab("catalog");
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("bg-indigo-600", "text-white"));
+      btn.classList.add("bg-indigo-600", "text-white");
+      currentType = btn.dataset.type;
       renderBusinesses();
-    </script>
-  </body>
-</html>
+    });
+  });
+
+  // --- Tabs ---
+  function switchTab(tab) {
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+    document.getElementById(tab).classList.remove("hidden");
+
+    document.querySelectorAll("nav button").forEach(b => {
+      b.classList.remove("border-indigo-500", "text-indigo-600");
+      b.classList.add("border-transparent", "text-gray-500");
+    });
+
+    document.getElementById(`tab-${tab}`).classList.add("border-indigo-500", "text-indigo-600");
+    document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-gray-500");
+  }
+
+  // --- Messages ---
+  let selectedBusiness = null;
+  const messageInput = document.getElementById("customer-message-input");
+  const chatMessages = document.getElementById("chat-messages");
+
+  function selectBusiness(business) {
+    selectedBusiness = business;
+    switchTab("messages");
+    messageInput.disabled = false;
+    messageInput.placeholder = "Type a message...";
+    document.querySelector("#messages button").classList.remove("cursor-not-allowed", "bg-gray-400");
+    document.getElementById("chat-business-name").textContent = business.name;
+    loadConversation(business.id);
+  }
+
+  async function loadConversation(businessId) {
+    chatMessages.innerHTML = "";
+    const convoRef = collection(db, "conversations");
+    const q = query(convoRef, where("businessId", "==", businessId), orderBy("timestamp"));
+    
+    onSnapshot(q, snapshot => {
+      chatMessages.innerHTML = "";
+      if (snapshot.empty) {
+        chatMessages.innerHTML = `
+          <div class="text-center text-gray-500">
+            <i class="fas fa-comment-dots text-3xl mb-3 opacity-50"></i>
+            <p class="text-base font-medium">No messages yet</p>
+          </div>`;
+        return;
+      }
+      snapshot.forEach(doc => {
+        const msg = doc.data();
+        const bubble = document.createElement("div");
+        bubble.className = `chat-bubble ${msg.sender === "business" ? "business" : "customer"}`;
+        bubble.textContent = msg.text;
+        chatMessages.appendChild(bubble);
+      });
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+  }
+
+  messageInput.addEventListener("keypress", async e => {
+    if (e.key === "Enter" && messageInput.value.trim() && selectedBusiness) {
+      const text = messageInput.value.trim();
+      await addDoc(collection(db, "conversations"), {
+        businessId: selectedBusiness.id,
+        sender: "customer",
+        text,
+        timestamp: new Date()
+      });
+      messageInput.value = "";
+    }
+  });
+
+  // --- Account Preferences ---
+  document.querySelector("button.bg-indigo-600").addEventListener("click", async () => {
+    const loc = document.querySelector("select").value;
+    // Here you would update Firestore customer doc with location preference
+    alert(`Preferences saved: ${loc}`);
+  });
+
+  // --- Logout ---
+  function logout() {
+    if (confirm("Are you sure you want to log out?")) alert("You have been logged out successfully.");
+  }
+
+  // --- Initialize ---
+  switchTab("catalog");
+  fetchBusinesses();
+</script>
