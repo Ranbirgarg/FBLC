@@ -1,56 +1,144 @@
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ===============================
+// Message Display Function
+// ===============================
+function showMessage(msg, isError = false) {
+    const messageEl = document.getElementById("message");
+    if (!messageEl) return;
 
-// Add a new business
+    messageEl.textContent = msg;
+    messageEl.style.color = isError ? "red" : "green";
+
+    setTimeout(() => {
+        messageEl.textContent = "";
+    }, 3000);
+}
+
+
+// ===============================
+// Add Business
+// ===============================
 function addBusiness(name, type, location, coupon) {
+
+    // validation
+    if (!name || !type || !location || !coupon) {
+        showMessage("Please fill in all fields!", true);
+        return;
+    }
+
     db.collection("businesses").add({
         name: name,
         type: type,
         location: location,
         coupon: coupon
     })
-    .then(() => console.log("Business added successfully!"))
-    .catch(error => console.error("Error adding business: ", error));
+    .then(() => {
+        showMessage("Business added successfully!");
+    })
+    .catch((error) => {
+        showMessage("Error adding business: " + error, true);
+    });
 }
 
-// Fetch all businesses
-function getAllBusinesses(callback) {
+
+// ===============================
+// Get All Businesses
+// ===============================
+function getAllBusinesses() {
+    const list = document.getElementById("businessList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
     db.collection("businesses").get()
-    .then(querySnapshot => {
-        const businesses = [];
-        querySnapshot.forEach(doc => businesses.push(doc.data()));
-        callback(businesses);
-    })
-    .catch(error => console.error("Error fetching businesses: ", error));
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                const data = doc.data();
+
+                const li = document.createElement("li");
+                li.textContent =
+                    `${data.name} | ${data.type} | ${data.location} | Coupon: ${data.coupon}`;
+
+                list.appendChild(li);
+            });
+
+            showMessage("Businesses loaded!");
+        })
+        .catch(error => {
+            showMessage("Error loading businesses: " + error, true);
+        });
 }
 
-// Search businesses by type
-function searchBusinessesByType(type, callback) {
-    db.collection("businesses").where("type", "==", type).get()
-    .then(querySnapshot => {
-        const results = [];
-        querySnapshot.forEach(doc => results.push(doc.data()));
-        callback(results);
-    })
-    .catch(error => console.error("Error searching businesses: ", error));
+
+// ===============================
+// Search Businesses By Type
+// ===============================
+function searchBusinessesByType(type) {
+
+    if (!type) {
+        showMessage("Enter a business type to search!", true);
+        return;
+    }
+
+    const list = document.getElementById("businessList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    db.collection("businesses")
+        .where("type", "==", type)
+        .get()
+        .then(snapshot => {
+
+            if (snapshot.empty) {
+                showMessage("No businesses found.", true);
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+
+                const li = document.createElement("li");
+                li.textContent =
+                    `${data.name} | ${data.type} | ${data.location} | Coupon: ${data.coupon}`;
+
+                list.appendChild(li);
+            });
+
+            showMessage("Search complete!");
+        })
+        .catch(error => {
+            showMessage("Search error: " + error, true);
+        });
 }
 
-// Sort businesses by field
-function sortBusinesses(field, callback) {
-    db.collection("businesses").orderBy(field).get()
-    .then(querySnapshot => {
-        const sorted = [];
-        querySnapshot.forEach(doc => sorted.push(doc.data()));
-        callback(sorted);
-    })
-    .catch(error => console.error("Error sorting businesses: ", error));
+
+// ===============================
+// Sort Businesses (Alphabetical)
+// ===============================
+function sortBusinesses() {
+
+    const list = document.getElementById("businessList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    db.collection("businesses")
+        .orderBy("name")
+        .get()
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                const data = doc.data();
+
+                const li = document.createElement("li");
+                li.textContent =
+                    `${data.name} | ${data.type} | ${data.location} | Coupon: ${data.coupon}`;
+
+                list.appendChild(li);
+            });
+
+            showMessage("Businesses sorted alphabetically!");
+        })
+        .catch(error => {
+            showMessage("Sort error: " + error, true);
+        });
 }
