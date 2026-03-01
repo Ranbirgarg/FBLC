@@ -1,159 +1,709 @@
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BusinessMonkey - Business Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <script>
-// ====== 1. Initialize Firebase ======
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#4f46e5",
+        secondary: "#6366f1",
+        accent: "#f59e0b",
+      },
+    },
+  },
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ====== 2. Tab Switching ======
-function showBusinessHome() {
-    document.getElementById("business-home-content").classList.remove("hidden");
-    document.getElementById("coupon-maker-content").classList.add("hidden");
-    document.getElementById("business-messages-content").classList.add("hidden");
-    document.getElementById("business-account-content").classList.add("hidden");
-    updateTabStyles("tab-dashboard");
-}
-function showCouponMaker() {
-    document.getElementById("business-home-content").classList.add("hidden");
-    document.getElementById("coupon-maker-content").classList.remove("hidden");
-    document.getElementById("business-messages-content").classList.add("hidden");
-    document.getElementById("business-account-content").classList.add("hidden");
-    updateTabStyles("tab-coupons");
-}
-function showBusinessMessages() {
-    document.getElementById("business-home-content").classList.add("hidden");
-    document.getElementById("coupon-maker-content").classList.add("hidden");
-    document.getElementById("business-messages-content").classList.remove("hidden");
-    document.getElementById("business-account-content").classList.add("hidden");
-    updateTabStyles("tab-messages");
-}
-function showBusinessAccount() {
-    document.getElementById("business-home-content").classList.add("hidden");
-    document.getElementById("coupon-maker-content").classList.add("hidden");
-    document.getElementById("business-messages-content").classList.add("hidden");
-    document.getElementById("business-account-content").classList.remove("hidden");
-    updateTabStyles("tab-settings");
-}
-function updateTabStyles(activeId) {
-    ["tab-dashboard","tab-coupons","tab-messages","tab-settings"].forEach(id=>{
-        const el = document.getElementById(id);
-        if(id===activeId){
-            el.classList.add("border-indigo-500","text-indigo-600");
-            el.classList.remove("border-transparent","text-gray-500");
-        } else {
-            el.classList.remove("border-indigo-500","text-indigo-600");
-            el.classList.add("border-transparent","text-gray-500");
-        }
-    });
-}
-
-// ====== 3. Create Coupon ======
-function createCoupon(e) {
-    e.preventDefault();
-    const code = document.getElementById("coupon-code").value.trim();
-    const discount = document.getElementById("coupon-discount").value.trim();
-    const expires = document.getElementById("coupon-expires").value;
-    if(!code || !discount || !expires) return alert("Fill all fields!");
-
-    const expiryDate = new Date(expires);
-    const formattedDate = expiryDate.toLocaleDateString("en-US", {
-        year:"numeric", month:"short", day:"numeric"
-    });
-
-    db.collection("coupons").add({
-        code: code.toUpperCase(),
-        discount,
-        expires: expiryDate,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        alert(`Coupon "${code}" created successfully!`);
-        const couponsList = document.getElementById("business-coupons-list");
-        const emptyState = couponsList.querySelector(".empty-state");
-        if(emptyState) emptyState.remove();
-
-        const newCoupon = document.createElement("div");
-        newCoupon.className = "flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200";
-        newCoupon.innerHTML = `
-            <div>
-                <p class="font-bold text-indigo-700 text-sm">${code.toUpperCase()}</p>
-                <p class="text-gray-700 text-xs">${discount}</p>
-            </div>
-            <div class="text-right">
-                <p class="text-xs text-gray-500">Expires: ${formattedDate}</p>
-                <p class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mt-0.5">0 redemptions</p>
-            </div>`;
-        couponsList.appendChild(newCoupon);
-
-        // Reset form
-        document.getElementById("coupon-code").value="";
-        document.getElementById("coupon-discount").value="";
-        document.getElementById("coupon-expires").value="";
-    })
-    .catch(err => {
-        console.error("Error creating coupon:", err);
-        alert("Failed to create coupon.");
-    });
-}
-
-// ====== 4. Send Business Message ======
-function sendBusinessMessage() {
-    const input = document.getElementById("business-message-input");
-    const message = input.value.trim();
-    if(!message) return;
-    const chatMessages = document.getElementById("chat-messages");
-    const newMessage = document.createElement("div");
-    newMessage.className="chat-bubble business";
-    newMessage.textContent = message;
-    chatMessages.appendChild(newMessage);
-    input.value="";
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-// ====== 5. Save Business Account Info ======
-document.querySelector("#business-account-content button").addEventListener("click", () => {
-    const name = document.querySelector('#business-account-content input[placeholder="Enter your business name"]').value;
-    const type = document.querySelector('#business-account-content select').value;
-    const location = document.querySelector('#business-account-content input[placeholder="Enter your business address"]').value;
-
-    if(!name || !type || !location) return alert("Fill all required fields!");
-
-    db.collection("businesses").add({
-        name,
-        type,
-        location,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(()=> alert("Business info saved!"))
-    .catch(err => {
-        console.error("Error saving business info:", err);
-        alert("Error saving business info.");
-    });
-});
-
-// ====== 6. Dashboard Stats (Example) ======
-function updateDashboardStats() {
-    db.collection("businesses").get()
-    .then(snapshot => {
-        document.querySelector(".stats-card p.text-2xl").textContent = snapshot.size;
-    })
-    .catch(err => console.error(err));
-}
-
-// ====== 7. Logout ======
-function logout() {
-    if(confirm("Are you sure you want to log out?")) alert("Logged out!");
-}
-
-// ====== 8. Initialize ======
-showBusinessHome();
-updateDashboardStats();
 </script>
+<style>
+.fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 16px; margin: 8px 0; word-wrap: break-word; }
+.chat-bubble.business { background: #e0e7ff; color: #1e1b4b; align-self: flex-start; border-bottom-left-radius: 4px; }
+.chat-bubble.customer { background: #fef3c7; color: #451a03; align-self: flex-end; margin-left: auto; border-bottom-right-radius: 4px; }
+.customer-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Login Page -->
+<div id="login-page" class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full fade-in">
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-monkey text-white text-2xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Business<span class="text-amber-600">Monkey</span></h1>
+      <p class="text-gray-600 mt-2">Owner Portal</p>
+    </div>
+    <form onsubmit="handleLogin(event)">
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Email</label>
+        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="your@business.com" required />
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 mb-2">Password</label>
+        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-colors font-medium">Sign In</button>
+    </form>
+    <div class="mt-6 text-center">
+      <p class="text-gray-600 text-sm">Don't have an account?</p>
+      <button onclick="showSignup()" class="text-amber-600 hover:text-amber-800 font-medium mt-1">Sign Up - $2.99/mo</button>
+    </div>
+    <div class="mt-4 text-center">
+      <button onclick="window.location.href='front.html'" class="text-gray-500 hover:text-gray-700 text-sm">← Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- Signup Page -->
+<div id="signup-page" class="hidden min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full fade-in">
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-monkey text-white text-2xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Business Signup</h1>
+      <p class="text-gray-600 mt-2">$2.99 per month</p>
+    </div>
+    <form onsubmit="handleSignup(event)">
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Business Name</label>
+        <input type="text" id="signup-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Your Business Name" required />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Type</label>
+        <select id="signup-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          <option value="">Select Type</option>
+          <option value="Food & Beverage">Food & Beverage</option>
+          <option value="Retail">Retail</option>
+          <option value="Services">Services</option>
+          <option value="Beauty & Wellness">Beauty & Wellness</option>
+          <option value="Home & Garden">Home & Garden</option>
+          <option value="Arts & Crafts">Arts & Crafts</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Location</label>
+        <input type="text" id="signup-location" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="City or Area" required />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Email</label>
+        <input type="email" id="signup-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="your@business.com" required />
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 mb-2">Password</label>
+        <input type="password" id="signup-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="••••••••" minlength="6" required />
+      </div>
+      <button type="submit" class="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-colors font-medium">Start Subscription</button>
+    </form>
+    <div class="mt-6 text-center">
+      <button onclick="showLogin()" class="text-amber-600 hover:text-amber-800 font-medium">Already have an account? Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard-page" class="hidden min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+          <i class="fas fa-monkey text-white text-lg"></i>
+        </div>
+        <h1 class="text-xl font-bold text-gray-800">Business<span class="text-amber-600">Monkey</span> Dashboard</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="header-business-name" class="text-gray-600 text-sm font-medium"></span>
+        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <nav class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex space-x-8 overflow-x-auto">
+        <button onclick="showTab('home')" class="nav-btn py-4 px-2 border-b-2 font-medium text-sm border-amber-500 text-amber-600" data-tab="home"><i class="fas fa-home mr-2"></i>Home</button>
+        <button onclick="showTab('customers')" class="nav-btn py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700" data-tab="customers"><i class="fas fa-users mr-2"></i>Customers</button>
+        <button onclick="showTab('coupons')" class="nav-btn py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700" data-tab="coupons"><i class="fas fa-tags mr-2"></i>Coupons</button>
+        <button onclick="showTab('messages')" class="nav-btn py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700" data-tab="messages"><i class="fas fa-comment-dots mr-2"></i>Messages</button>
+        <button onclick="showTab('account')" class="nav-btn py-4 px-2 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700" data-tab="account"><i class="fas fa-user mr-2"></i>Account</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content Area -->
+  <main class="max-w-7xl mx-auto p-6">
+    
+    <!-- Home Tab -->
+    <div id="tab-home" class="tab-content fade-in">
+      <h2 class="text-2xl font-bold mb-6">Dashboard Overview</h2>
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Views Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 mb-1 text-sm font-medium">Total Views</p>
+              <p class="text-3xl font-bold text-indigo-600" id="dash-views">0</p>
+            </div>
+            <i class="fas fa-eye text-indigo-100 text-3xl"></i>
+          </div>
+        </div>
+        <!-- Rating Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 mb-1 text-sm font-medium">Average Rating</p>
+              <p class="text-3xl font-bold text-yellow-600" id="dash-rating">0.0</p>
+            </div>
+            <i class="fas fa-star text-yellow-100 text-3xl"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="text-lg font-semibold mb-4 text-gray-700">Active Coupons</h3>
+        <div id="home-coupons-list" class="space-y-3">
+          <p class="text-gray-500 text-sm">No active coupons. Create one in the Coupons tab!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers Tab (NEW) -->
+    <div id="tab-customers" class="tab-content hidden fade-in">
+      <h2 class="text-2xl font-bold mb-6">Customer Catalog</h2>
+      
+      <!-- Search -->
+      <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+          <input type="text" id="customer-search" oninput="filterCustomers()" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Search customers by email..." />
+        </div>
+      </div>
+
+      <!-- Customer Grid -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="customers-grid">
+        <!-- Customer cards will be populated here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="customers-empty" class="hidden text-center py-12">
+        <i class="fas fa-users-slash text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No customers yet</h3>
+        <p class="text-gray-500">Customers will appear here once they message you</p>
+      </div>
+    </div>
+
+    <!-- Coupons Tab -->
+    <div id="tab-coupons" class="tab-content hidden fade-in">
+      <h2 class="text-2xl font-bold mb-6">Create Coupon</h2>
+      <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+        <form onsubmit="createCoupon(event)">
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-gray-700 mb-2 text-sm font-medium">Coupon Code</label>
+              <input type="text" id="coupon-code" class="w-full px-4 py-2 border border-gray-300 rounded-lg uppercase" placeholder="WELCOME10" required />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 text-sm font-medium">Expiration Date</label>
+              <input type="date" id="coupon-expires" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required />
+            </div>
+          </div>
+          <div class="mb-6">
+            <label class="block text-gray-700 mb-2 text-sm font-medium">Discount Description</label>
+            <textarea id="coupon-discount" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="10% off your first purchase" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors">Create Coupon</button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="text-lg font-semibold mb-4 text-gray-700">All Coupons</h3>
+        <div id="all-coupons-list" class="space-y-3">
+          <p class="text-gray-500 text-sm">No coupons created yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Tab -->
+    <div id="tab-messages" class="tab-content hidden fade-in">
+      <h2 class="text-2xl font-bold mb-6">Customer Messages</h2>
+      <div class="bg-white rounded-xl shadow-md h-[500px] flex flex-col">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 class="font-semibold text-gray-700" id="chat-header">Select a conversation</h3>
+          <span id="chat-status" class="text-sm text-green-600 hidden"><i class="fas fa-circle text-xs mr-1"></i>Online</span>
+        </div>
+        <div id="messages-list" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+          <div class="text-center text-gray-500 mt-12">
+            <i class="fas fa-comments text-4xl mb-3 opacity-50"></i>
+            <p>Select a customer from the catalog to chat</p>
+          </div>
+        </div>
+        <div class="p-4 border-t border-gray-200 flex space-x-2 bg-white">
+          <input type="text" id="message-input" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Type your response..." disabled />
+          <button onclick="sendMessage()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400" id="send-btn" disabled>
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Recent Conversations -->
+      <div class="mt-6 bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-700">Recent Conversations</h3>
+        <div id="conversation-list" class="space-y-2">
+          <p class="text-gray-500 text-sm">No conversations yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Tab -->
+    <div id="tab-account" class="tab-content hidden fade-in">
+      <h2 class="text-2xl font-bold mb-6">Account Settings</h2>
+      <div class="bg-white p-6 rounded-xl shadow-md max-w-2xl">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-gray-700 mb-2 text-sm font-medium">Business Name</label>
+            <input type="text" id="acc-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2 text-sm font-medium">Type</label>
+            <select id="acc-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              <option value="Food & Beverage">Food & Beverage</option>
+              <option value="Retail">Retail</option>
+              <option value="Services">Services</option>
+              <option value="Beauty & Wellness">Beauty & Wellness</option>
+              <option value="Home & Garden">Home & Garden</option>
+              <option value="Arts & Crafts">Arts & Crafts</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2 text-sm font-medium">Location</label>
+            <input type="text" id="acc-location" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2 text-sm font-medium">Email</label>
+            <input type="email" id="acc-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly />
+          </div>
+          <div class="pt-4 flex space-x-3">
+            <button onclick="saveAccount()" class="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600">Save Changes</button>
+            <button onclick="loadAccount()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ===============================
+// State & Storage
+// ===============================
+const STORAGE_KEY = 'bm_businesses';
+const CUSTOMERS_KEY = 'bm_customers';
+let currentBusiness = null;
+let selectedCustomerEmail = null;
+
+// Helper: Get all businesses
+function getBusinesses() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+// Helper: Save all businesses
+function saveBusinesses(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+// Helper: Get all customers
+function getCustomers() {
+  const data = localStorage.getItem(CUSTOMERS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+// Helper: Save all customers
+function saveCustomers(list) {
+  localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(list));
+}
+
+// ===============================
+// Auth Functions
+// ===============================
+function showLogin() {
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('signup-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.add('hidden');
+}
+
+function showSignup() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('signup-page').classList.remove('hidden');
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  
+  const businesses = getBusinesses();
+  const business = businesses.find(b => b.email === email && b.password === password);
+  
+  if (business) {
+    currentBusiness = business;
+    initDashboard();
+  } else {
+    alert('Invalid credentials. Please sign up first.');
+  }
+}
+
+function handleSignup(e) {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value.trim();
+  const type = document.getElementById('signup-type').value;
+  const location = document.getElementById('signup-location').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+
+  const businesses = getBusinesses();
+  if (businesses.find(b => b.email === email)) {
+    alert('Email already registered.');
+    return;
+  }
+
+  const newBusiness = {
+    id: Date.now(),
+    name, type, location, email, password,
+    rating: 5.0,
+    views: 0,
+    coupons: [],
+    messages: []
+  };
+
+  businesses.push(newBusiness);
+  saveBusinesses(businesses);
+  currentBusiness = newBusiness;
+  initDashboard();
+}
+
+function logout() {
+  if(confirm('Are you sure?')) {
+    currentBusiness = null;
+    selectedCustomerEmail = null;
+    showLogin();
+  }
+}
+
+// ===============================
+// Dashboard Logic
+// ===============================
+function initDashboard() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('signup-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.remove('hidden');
+  
+  document.getElementById('header-business-name').textContent = currentBusiness.name;
+  updateStats();
+  showTab('home');
+}
+
+function showTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+  
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    if (btn.dataset.tab === tabName) {
+      btn.classList.add('border-amber-500', 'text-amber-600');
+      btn.classList.remove('border-transparent', 'text-gray-500');
+    } else {
+      btn.classList.remove('border-amber-500', 'text-amber-600');
+      btn.classList.add('border-transparent', 'text-gray-500');
+    }
+  });
+
+  if (tabName === 'home') updateStats();
+  if (tabName === 'customers') renderCustomers();
+  if (tabName === 'coupons') renderCoupons();
+  if (tabName === 'messages') renderConversations();
+  if (tabName === 'account') loadAccount();
+}
+
+function updateStats() {
+  const businesses = getBusinesses();
+  const freshData = businesses.find(b => b.id === currentBusiness.id);
+  if (freshData) currentBusiness = freshData;
+
+  document.getElementById('dash-views').textContent = currentBusiness.views || 0;
+  document.getElementById('dash-rating').textContent = (currentBusiness.rating || 0).toFixed(1);
+  
+  const homeList = document.getElementById('home-coupons-list');
+  if (!currentBusiness.coupons || currentBusiness.coupons.length === 0) {
+    homeList.innerHTML = '<p class="text-gray-500 text-sm">No active coupons.</p>';
+  } else {
+    homeList.innerHTML = currentBusiness.coupons.slice(0, 3).map(c => `
+      <div class="flex justify-between items-center p-3 bg-gray-50 rounded border">
+        <div><span class="font-bold text-indigo-700">${c.code}</span><span class="text-xs text-gray-600 block">${c.discount}</span></div>
+        <span class="text-xs text-gray-500">Expires: ${c.expires}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ===============================
+// Customers Tab (NEW)
+// ===============================
+function getUniqueCustomers() {
+  const messages = currentBusiness.messages || [];
+  const customerEmails = [...new Set(messages.filter(m => m.sender === 'customer').map(m => m.from))];
+  
+  const allCustomers = getCustomers();
+  
+  return customerEmails.map(email => {
+    const customer = allCustomers.find(c => c.email === email);
+    const customerMessages = messages.filter(m => m.from === email);
+    const lastMessage = customerMessages[customerMessages.length - 1];
+    
+    return {
+      email: email,
+      name: customer ? customer.name : email.split('@')[0],
+      joined: customer ? customer.memberSince : 'Unknown',
+      messagesCount: customerMessages.length,
+      lastMessage: lastMessage ? lastMessage.text : '',
+      lastMessageTime: lastMessage ? lastMessage.timestamp : null
+    };
+  });
+}
+
+function renderCustomers() {
+  const customers = getUniqueCustomers();
+  const grid = document.getElementById('customers-grid');
+  const emptyState = document.getElementById('customers-empty');
+  
+  if (customers.length === 0) {
+    grid.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  
+  emptyState.classList.add('hidden');
+  grid.innerHTML = customers.map(c => {
+    const isActive = selectedCustomerEmail === c.email ? 'ring-2 ring-amber-500' : '';
+    return `
+      <div onclick="selectCustomer('${c.email}')" class="customer-card bg-white p-6 rounded-xl shadow-md cursor-pointer transition-all ${isActive}">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center">
+            <span class="text-white font-bold text-lg">${c.name.charAt(0).toUpperCase()}</span>
+          </div>
+          <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">${c.messagesCount} messages</span>
+        </div>
+        <h3 class="font-semibold text-gray-800 mb-1">${c.name}</h3>
+        <p class="text-sm text-gray-500 mb-3">${c.email}</p>
+        <p class="text-xs text-gray-400 mb-3">Joined: ${c.joined}</p>
+        <p class="text-sm text-gray-600 truncate bg-gray-50 p-2 rounded">${c.lastMessage || 'No messages yet'}</p>
+        <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 text-sm font-medium">
+          <i class="fas fa-comment mr-2"></i>Message
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterCustomers() {
+  const search = document.getElementById('customer-search').value.toLowerCase();
+  const cards = document.querySelectorAll('.customer-card');
+  
+  cards.forEach(card => {
+    const email = card.querySelector('p.text-gray-500').textContent.toLowerCase();
+    const name = card.querySelector('h3').textContent.toLowerCase();
+    
+    if (email.includes(search) || name.includes(search)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function selectCustomer(email) {
+  selectedCustomerEmail = email;
+  renderCustomers();
+  openChat(email);
+  showTab('messages');
+}
+
+// ===============================
+// Coupons
+// ===============================
+function createCoupon(e) {
+  e.preventDefault();
+  const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+  const discount = document.getElementById('coupon-discount').value.trim();
+  const expires = document.getElementById('coupon-expires').value;
+
+  const businesses = getBusinesses();
+  const idx = businesses.findIndex(b => b.id === currentBusiness.id);
+  
+  businesses[idx].coupons.push({ id: Date.now(), code, discount, expires });
+  saveBusinesses(businesses);
+  currentBusiness = businesses[idx];
+  
+  alert('Coupon created!');
+  e.target.reset();
+  renderCoupons();
+  updateStats();
+}
+
+function renderCoupons() {
+  const list = document.getElementById('all-coupons-list');
+  if (!currentBusiness.coupons || currentBusiness.coupons.length === 0) {
+    list.innerHTML = '<p class="text-gray-500 text-sm">No coupons yet.</p>';
+    return;
+  }
+  list.innerHTML = currentBusiness.coupons.map((c, index) => `
+    <div class="flex justify-between items-center p-4 bg-green-50 rounded border border-green-200">
+      <div>
+        <p class="font-bold text-green-800">${c.code}</p>
+        <p class="text-sm text-green-700">${c.discount}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-green-600">Expires: ${c.expires}</p>
+        <button onclick="deleteCoupon(${index})" class="text-red-500 text-xs hover:underline mt-1">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteCoupon(index) {
+  if(!confirm('Delete this coupon?')) return;
+  const businesses = getBusinesses();
+  const idx = businesses.findIndex(b => b.id === currentBusiness.id);
+  businesses[idx].coupons.splice(index, 1);
+  saveBusinesses(businesses);
+  currentBusiness = businesses[idx];
+  renderCoupons();
+  updateStats();
+}
+
+// ===============================
+// Messages
+// ===============================
+function renderConversations() {
+  const list = document.getElementById('conversation-list');
+  const messages = currentBusiness.messages || [];
+  
+  const conversations = {};
+  messages.forEach(msg => {
+    if (!conversations[msg.from]) conversations[msg.from] = [];
+    conversations[msg.from].push(msg);
+  });
+
+  const emails = Object.keys(conversations);
+  
+  if (emails.length === 0) {
+    list.innerHTML = '<p class="text-gray-500 text-sm">No conversations yet.</p>';
+    return;
+  }
+
+  list.innerHTML = emails.map(email => {
+    const conv = conversations[email];
+    const lastMsg = conv[conv.length - 1];
+    const isActive = selectedCustomerEmail === email ? 'bg-indigo-50 border-indigo-200' : 'hover:bg-gray-50 border-transparent';
+    return `
+      <div onclick="openChat('${email}')" class="p-3 border rounded-lg cursor-pointer ${isActive} transition-colors">
+        <div class="flex justify-between">
+          <span class="font-medium text-gray-800">${email}</span>
+          <span class="text-xs text-gray-500">${new Date(lastMsg.timestamp).toLocaleDateString()}</span>
+        </div>
+        <p class="text-sm text-gray-600 truncate">${lastMsg.text}</p>
+      </div>
+    `;
+  }).join('');
+}
+
+function openChat(customerEmail) {
+  selectedCustomerEmail = customerEmail;
+  renderConversations();
+  renderCustomers();
+  
+  document.getElementById('chat-header').textContent = `Chat with ${customerEmail}`;
+  document.getElementById('chat-status').classList.remove('hidden');
+  document.getElementById('message-input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  
+  const messages = currentBusiness.messages || [];
+  const chatHistory = messages.filter(m => m.from === customerEmail);
+  
+  const container = document.getElementById('messages-list');
+  if (chatHistory.length === 0) {
+    container.innerHTML = '<p class="text-center text-gray-500 mt-4">No messages yet. Start the conversation!</p>';
+  } else {
+    container.innerHTML = chatHistory.map(m => `
+      <div class="chat-bubble ${m.sender}">
+        <p class="text-sm">${m.text}</p>
+        <p class="text-[10px] text-gray-500 mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+      </div>
+    `).join('');
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+function sendMessage() {
+  const input = document.getElementById('message-input');
+  const text = input.value.trim();
+  if (!text || !selectedCustomerEmail) return;
+
+  const businesses = getBusinesses();
+  const idx = businesses.findIndex(b => b.id === currentBusiness.id);
+  
+  businesses[idx].messages.push({
+    from: selectedCustomerEmail,
+    text: text,
+    sender: 'business',
+    timestamp: new Date().toISOString()
+  });
+  
+  saveBusinesses(businesses);
+  currentBusiness = businesses[idx];
+  input.value = '';
+  openChat(selectedCustomerEmail);
+}
+
+// ===============================
+// Account
+// ===============================
+function loadAccount() {
+  document.getElementById('acc-name').value = currentBusiness.name;
+  document.getElementById('acc-type').value = currentBusiness.type;
+  document.getElementById('acc-location').value = currentBusiness.location;
+  document.getElementById('acc-email').value = currentBusiness.email;
+}
+
+function saveAccount() {
+  const name = document.getElementById('acc-name').value.trim();
+  const type = document.getElementById('acc-type').value;
+  const location = document.getElementById('acc-location').value.trim();
+
+  const businesses = getBusinesses();
+  const idx = businesses.findIndex(b => b.id === currentBusiness.id);
+  
+  businesses[idx].name = name;
+  businesses[idx].type = type;
+  businesses[idx].location = location;
+  
+  saveBusinesses(businesses);
+  currentBusiness = businesses[idx];
+  document.getElementById('header-business-name').textContent = name;
+  alert('Settings saved!');
+}
+
+// Initialize
+showLogin();
+</script>
+</body>
+</html>
