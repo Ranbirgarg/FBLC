@@ -193,7 +193,7 @@ class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-
 >
 <i class="fas fa-store text-indigo-600 text-2xl"></i>
 </div>
-<h3 class="text-3xl font-bold text-indigo-600 mb-2">500+</h3>
+<h3 class="text-3xl font-bold text-indigo-600 mb-2" id="stat-businesses">0</h3>
 <p class="text-gray-700">Active Businesses</p>
 </div>
 <div
@@ -204,7 +204,7 @@ class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-a
 >
 <i class="fas fa-users text-amber-600 text-2xl"></i>
 </div>
-<h3 class="text-3xl font-bold text-amber-600 mb-2">10,000+</h3>
+<h3 class="text-3xl font-bold text-amber-600 mb-2" id="stat-customers">0</h3>
 <p class="text-gray-700">Community Members</p>
 </div>
 <div
@@ -215,10 +215,8 @@ class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-a
 >
 <i class="fas fa-chart-line text-green-600 text-2xl"></i>
 </div>
-<h3 class="text-3xl font-bold text-green-600 mb-2">
-$250,000+
-</h3>
-<p class="text-gray-700">Local Revenue Generated</p>
+<h3 class="text-3xl font-bold text-green-600 mb-2" id="stat-views">0</h3>
+<p class="text-gray-700">Total Business Views</p>
 </div>
 </div>
 </div>
@@ -406,7 +404,7 @@ class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center"
 Business Analytics
 </h4>
 <p class="text-gray-600">
-Track your views, sales, and customer engagement with
+Track your views and customer engagement with
 detailed statistics.
 </p>
 </div>
@@ -1199,7 +1197,7 @@ id="tab-settings"
 <!-- Business Home Content -->
 <div id="business-home-content" class="p-6">
 <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-<div class="grid md:grid-cols-3 gap-6">
+<div class="grid md:grid-cols-2 gap-6">
 <div class="bg-white p-6 rounded-xl shadow-md">
 <div class="flex items-center justify-between">
 <div>
@@ -1212,20 +1210,6 @@ id="business-views"
 </p>
 </div>
 <i class="fas fa-eye text-indigo-100 text-3xl"></i>
-</div>
-</div>
-<div class="bg-white p-6 rounded-xl shadow-md">
-<div class="flex items-center justify-between">
-<div>
-<p class="text-gray-600 mb-1">Sales</p>
-<p
-class="text-3xl font-bold text-green-600"
-id="business-sales"
->
-0
-</p>
-</div>
-<i class="fas fa-chart-line text-green-100 text-3xl"></i>
 </div>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-md">
@@ -1573,129 +1557,71 @@ readonly
 </div>
 </div>
 <script>
+// ===============================
+// localStorage Data Management
+// ===============================
+const STORAGE_KEYS = {
+BUSINESSES: 'bm_businesses',
+CUSTOMERS: 'bm_customers',
+CURRENT_USER: 'bm_current_user'
+};
+
 // Global state
 let currentUser = null;
 let currentBusiness = null;
 let selectedBusinessId = null;
-let businesses = [
-{
-id: 1,
-name: "Bella Bakery",
-type: "Food & Beverage",
-description: "Artisanal bread and pastries made with love",
-location: "Downtown",
-rating: 4.8,
-views: 1250,
-sales: 89,
-coupons: [
-{
-id: 1,
-code: "WELCOME10",
-discount: "10% off",
-expires: "2026-01-31",
-},
-{
-id: 2,
-code: "FREESHIP",
-discount: "Free delivery",
-expires: "2026-02-15",
-},
-],
-messages: [],
-},
-{
-id: 2,
-name: "Urban Threads",
-type: "Retail",
-description: "Sustainable fashion for the modern woman",
-location: "Westside Mall",
-rating: 4.6,
-views: 980,
-sales: 156,
-coupons: [
-{
-id: 3,
-code: "NEWCUST15",
-discount: "15% off first purchase",
-expires: "2026-03-01",
-},
-],
-messages: [],
-},
-{
-id: 3,
-name: "Tech Fix Pro",
-type: "Services",
-description: "Fast and reliable tech repair services",
-location: "North District",
-rating: 4.9,
-views: 2100,
-sales: 342,
-coupons: [],
-messages: [],
-},
-{
-id: 4,
-name: "Sunrise Cafe",
-type: "Food & Beverage",
-description: "Fresh coffee and breakfast all day",
-location: "Downtown",
-rating: 4.7,
-views: 1580,
-sales: 203,
-coupons: [
-{
-id: 4,
-code: "COFFEE20",
-discount: "20% off all drinks",
-expires: "2026-02-28",
-},
-],
-messages: [],
-},
-{
-id: 5,
-name: "Green Thumb Garden",
-type: "Home & Garden",
-description: "Plants, seeds, and gardening supplies",
-location: "Uptown",
-rating: 4.5,
-views: 720,
-sales: 67,
-coupons: [
-{
-id: 5,
-code: "PLANTFREE",
-discount: "Free plant with $50 purchase",
-expires: "2026-03-15",
-},
-],
-messages: [],
-},
-{
-id: 6,
-name: "Zen Spa",
-type: "Beauty & Wellness",
-description: "Relaxation and wellness treatments",
-location: "Midtown",
-rating: 4.9,
-views: 1890,
-sales: 278,
-coupons: [
-{
-id: 6,
-code: "SPA20OFF",
-discount: "20% off all services",
-expires: "2026-02-20",
-},
-],
-messages: [],
-},
-];
 let currentFilterType = "";
 let currentSearchTerm = "";
 
+// ===============================
+// localStorage Helper Functions
+// ===============================
+function getBusinesses() {
+const data = localStorage.getItem(STORAGE_KEYS.BUSINESSES);
+return data ? JSON.parse(data) : [];
+}
+
+function saveBusinesses(businesses) {
+localStorage.setItem(STORAGE_KEYS.BUSINESSES, JSON.stringify(businesses));
+}
+
+function getCustomers() {
+const data = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
+return data ? JSON.parse(data) : [];
+}
+
+function saveCustomers(customers) {
+localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(customers));
+}
+
+function updateStats() {
+const businesses = getBusinesses();
+const customers = getCustomers();
+const totalViews = businesses.reduce((sum, b) => sum + (b.views || 0), 0);
+document.getElementById('stat-businesses').textContent = businesses.length;
+document.getElementById('stat-customers').textContent = customers.length;
+document.getElementById('stat-views').textContent = totalViews.toLocaleString();
+}
+
+// ===============================
+// Track Business View
+// ===============================
+function trackBusinessView(businessId) {
+const businesses = getBusinesses();
+const index = businesses.findIndex(b => b.id === businessId);
+if (index !== -1) {
+if (!businesses[index].views) businesses[index].views = 0;
+businesses[index].views += 1;
+saveBusinesses(businesses);
+updateStats();
+return businesses[index].views;
+}
+return 0;
+}
+
+// ===============================
 // Show/hide functions for main pages
+// ===============================
 function showLanding() {
 document.getElementById("landing-page").classList.remove("hidden");
 document.getElementById("how-it-works-page").classList.add("hidden");
@@ -1708,6 +1634,7 @@ document
 .classList.add("hidden");
 document.getElementById("business-dashboard").classList.add("hidden");
 document.getElementById("customer-dashboard").classList.add("hidden");
+updateStats();
 }
 
 function showHowItWorks() {
@@ -1764,6 +1691,7 @@ document
 document
 .getElementById("business-account-content")
 .classList.add("hidden");
+document.getElementById("business-header-name").textContent = currentBusiness.name;
 updateBusinessDashboard();
 }
 
@@ -1778,6 +1706,7 @@ document
 document
 .getElementById("customer-account-content")
 .classList.add("hidden");
+document.getElementById("customer-header-email").textContent = currentUser.email;
 renderBusinesses();
 }
 
@@ -1917,7 +1846,6 @@ const name = document.getElementById("contact-name").value;
 const email = document.getElementById("contact-email").value;
 const subject = document.getElementById("contact-subject").value;
 const message = document.getElementById("contact-message").value;
-// In a real app, you would send this to a server
 alert("Thank you for your message! We'll get back to you soon.");
 document.getElementById("contact-name").value = "";
 document.getElementById("contact-email").value = "";
@@ -1925,7 +1853,9 @@ document.getElementById("contact-subject").value = "";
 document.getElementById("contact-message").value = "";
 }
 
-// Authentication functions - FIXED: Now properly connected to forms
+// ===============================
+// Authentication Functions
+// ===============================
 function handleLogin(e) {
 e.preventDefault();
 const email = document.getElementById("login-email").value;
@@ -1933,18 +1863,30 @@ const password = document.getElementById("login-password").value;
 const userType = document.querySelector(
 'input[name="user-type"]:checked',
 ).value;
+
 if (email && password) {
-currentUser = { email, userType, id: Date.now() };
+// Check localStorage for existing user
 if (userType === "business") {
-// Find or create business
-currentBusiness = businesses[0];
-document.getElementById("business-header-name").textContent = currentBusiness.name;
+const businesses = getBusinesses();
+const business = businesses.find(b => b.email === email);
+if (business) {
+currentUser = { email, userType: "business" };
+currentBusiness = business;
 showBusinessDashboard();
-} else {
-document.getElementById("customer-header-email").textContent = email;
-showCustomerDashboard();
-}
 document.getElementById("login-modal").classList.add("hidden");
+return;
+}
+} else {
+const customers = getCustomers();
+const customer = customers.find(c => c.email === email);
+if (customer) {
+currentUser = { email, userType: "person" };
+showCustomerDashboard();
+document.getElementById("login-modal").classList.add("hidden");
+return;
+}
+}
+alert("Invalid credentials. Please sign up first.");
 }
 }
 
@@ -1952,9 +1894,23 @@ function handleSignupPerson(e) {
 e.preventDefault();
 const email = document.getElementById("person-email").value;
 const password = document.getElementById("person-password").value;
+
 if (email && password) {
-currentUser = { email, userType: "person", id: Date.now() };
-document.getElementById("customer-header-email").textContent = email;
+const customers = getCustomers();
+// Check if email already exists
+if (customers.find(c => c.email === email)) {
+alert("Email already registered. Please login.");
+return;
+}
+const newCustomer = {
+email,
+userType: "person",
+id: Date.now(),
+memberSince: new Date().toLocaleDateString()
+};
+customers.push(newCustomer);
+saveCustomers(customers);
+currentUser = { email, userType: "person" };
 showCustomerDashboard();
 document.getElementById("signup-person-modal").classList.add("hidden");
 }
@@ -1964,33 +1920,34 @@ function handleSignupBusiness(e) {
 e.preventDefault();
 const businessName = document.getElementById("business-name").value;
 const businessType = document.getElementById("business-type").value;
-const businessLocation =
-document.getElementById("business-location").value;
+const businessLocation = document.getElementById("business-location").value;
 const email = document.getElementById("business-email").value;
 const password = document.getElementById("business-password").value;
-if (
-businessName &&
-businessType &&
-businessLocation &&
-email &&
-password
-) {
+
+if (businessName && businessType && businessLocation && email && password) {
+const businesses = getBusinesses();
+// Check if email already exists
+if (businesses.find(b => b.email === email)) {
+alert("Email already registered. Please login.");
+return;
+}
 const newBusiness = {
 id: Date.now(),
 name: businessName,
 type: businessType,
 description: "New business on BusinessMonkey",
 location: businessLocation,
+email: email,
 rating: 5.0,
 views: 0,
-sales: 0,
 coupons: [],
 messages: [],
+createdAt: new Date().toISOString()
 };
 businesses.push(newBusiness);
-currentUser = { email, userType: "business", id: Date.now() };
+saveBusinesses(businesses);
+currentUser = { email, userType: "business" };
 currentBusiness = newBusiness;
-document.getElementById("business-header-name").textContent = businessName;
 showBusinessDashboard();
 document.getElementById("signup-business-modal").classList.add("hidden");
 }
@@ -2005,17 +1962,17 @@ showLanding();
 }
 }
 
-// Business dashboard functions
+// ===============================
+// Business Dashboard Functions
+// ===============================
 function updateBusinessDashboard() {
 if (!currentBusiness) return;
 document.getElementById("business-views").textContent =
-currentBusiness.views;
-document.getElementById("business-sales").textContent =
-currentBusiness.sales;
+currentBusiness.views || 0;
 document.getElementById("business-rating").textContent =
-currentBusiness.rating;
+currentBusiness.rating || 0;
 const couponsList = document.getElementById("business-coupons-list");
-if (currentBusiness.coupons.length === 0) {
+if (!currentBusiness.coupons || currentBusiness.coupons.length === 0) {
 couponsList.innerHTML =
 '<p class="text-gray-600">No active coupons. Create one!</p>';
 } else {
@@ -2054,18 +2011,21 @@ return;
 const code = document.getElementById("coupon-code").value.trim();
 const discount = document.getElementById("coupon-discount").value.trim();
 const expires = document.getElementById("coupon-expires").value;
+
 if (code && discount && expires) {
-const expiryDate = new Date(expires);
-const formattedDate = expiryDate.toLocaleDateString("en-US", {
-year:"numeric", month:"short", day:"numeric"
-});
-currentBusiness.coupons.push({
+const businesses = getBusinesses();
+const index = businesses.findIndex(b => b.id === currentBusiness.id);
+if (index !== -1) {
+if (!businesses[index].coupons) businesses[index].coupons = [];
+businesses[index].coupons.push({
 id: Date.now(),
 code: code.toUpperCase(),
 discount: discount,
-expires: formattedDate,
+expires: expires
 });
-// Clear form
+saveBusinesses(businesses);
+currentBusiness = businesses[index];
+}
 document.getElementById("coupon-code").value = "";
 document.getElementById("coupon-discount").value = "";
 document.getElementById("coupon-expires").value = "";
@@ -2077,7 +2037,7 @@ alert(`Coupon "${code.toUpperCase()}" created successfully!`);
 function renderBusinessMessages() {
 if (!currentBusiness) return;
 const messagesList = document.getElementById("business-messages-list");
-const businessMessages = currentBusiness.messages.filter(msg => msg.sender === "customer");
+const businessMessages = currentBusiness.messages || [];
 if (businessMessages.length === 0) {
 messagesList.innerHTML =
 '<p class="text-gray-500 text-center mt-8">No messages yet</p>';
@@ -2085,11 +2045,9 @@ messagesList.innerHTML =
 messagesList.innerHTML = businessMessages
 .map(
 (msg) => `
-<div class="chat-bubble business">
+<div class="chat-bubble ${msg.sender === "business" ? "business" : "customer"}">
 <p class="text-gray-800">${msg.text}</p>
-<p class="text-xs text-gray-500 mt-1">${new Date(
-msg.timestamp,
-).toLocaleString()}</p>
+<p class="text-xs text-gray-500 mt-1">${new Date(msg.timestamp).toLocaleString()}</p>
 </div>
 `,
 )
@@ -2101,53 +2059,63 @@ function sendBusinessMessage() {
 const messageInput = document.getElementById("business-message-input");
 const message = messageInput.value.trim();
 if (message && currentBusiness) {
-currentBusiness.messages.push({
+const businesses = getBusinesses();
+const index = businesses.findIndex(b => b.id === currentBusiness.id);
+if (index !== -1) {
+if (!businesses[index].messages) businesses[index].messages = [];
+businesses[index].messages.push({
 id: Date.now(),
 text: message,
 sender: "business",
-timestamp: new Date(),
+timestamp: new Date().toISOString()
 });
+saveBusinesses(businesses);
+currentBusiness = businesses[index];
+}
 messageInput.value = "";
 renderBusinessMessages();
 }
 }
 
-// Customer functions
+// ===============================
+// Customer Functions
+// ===============================
 function renderBusinesses() {
-let filtered = businesses;
+// Get businesses from localStorage (ONLY real businesses created by owners)
+let businesses = getBusinesses();
+
+// Apply search filter
 if (currentSearchTerm) {
-filtered = filtered.filter(
-(business) =>
-business.name
-.toLowerCase()
-.includes(currentSearchTerm.toLowerCase()) ||
-business.description
-.toLowerCase()
-.includes(currentSearchTerm.toLowerCase()) ||
-business.location
-.toLowerCase()
-.includes(currentSearchTerm.toLowerCase()),
+const search = currentSearchTerm.toLowerCase();
+businesses = businesses.filter(b =>
+b.name.toLowerCase().includes(search) ||
+b.type.toLowerCase().includes(search) ||
+b.location.toLowerCase().includes(search) ||
+(b.description && b.description.toLowerCase().includes(search))
 );
 }
+
+// Apply type filter
 if (currentFilterType) {
-filtered = filtered.filter(
-(business) => business.type === currentFilterType,
-);
+businesses = businesses.filter(b => b.type === currentFilterType);
 }
+
 const grid = document.getElementById("businesses-grid");
-if(filtered.length === 0) {
+
+if (businesses.length === 0) {
 grid.innerHTML = `
-<div class="empty-state col-span-full text-center py-12">
-<i class="fas fa-store text-4xl text-gray-300 mb-4"></i>
-<p class="text-xl font-semibold text-gray-600">No businesses found</p>
-<p class="text-gray-500">Try adjusting your search or filters</p>
+<div class="col-span-full text-center py-12">
+<i class="fas fa-store-slash text-5xl text-gray-300 mb-4"></i>
+<h3 class="text-xl font-semibold text-gray-600 mb-2">No businesses yet</h3>
+<p class="text-gray-500">Be the first business owner to sign up!</p>
 </div>`;
 return;
 }
-grid.innerHTML = filtered
+
+grid.innerHTML = businesses
 .map(
 (business) => `
-<div class="bg-white rounded-xl shadow-md overflow-hidden business-card hover:shadow-lg transition-shadow">
+<div class="bg-white rounded-xl shadow-md overflow-hidden business-card hover:shadow-lg transition-shadow fade-in">
 <div class="p-6">
 <div class="flex justify-between items-start mb-3">
 <h3 class="text-xl font-bold text-gray-800">${business.name}</h3>
@@ -2156,7 +2124,7 @@ grid.innerHTML = filtered
 <span class="text-sm font-semibold text-yellow-800">${business.rating}</span>
 </div>
 </div>
-<p class="text-gray-600 mb-3">${business.description}</p>
+<p class="text-gray-600 mb-3">${business.description || "Local business"}</p>
 <div class="flex items-center text-gray-500 mb-4">
 <i class="fas fa-map-marker-alt mr-1 text-sm"></i>
 <span class="text-sm">${business.location}</span>
@@ -2166,26 +2134,30 @@ grid.innerHTML = filtered
 ${business.type}
 </span>
 ${
-business.coupons.length > 0
+business.coupons && business.coupons.length > 0
 ? `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-${business.coupons.length} coupon${business.coupons.length !== 1 ? "s" : ""}
+<i class="fas fa-tag mr-1"></i>${business.coupons.length} coupon${business.coupons.length !== 1 ? "s" : ""}
 </span>`
 : ""
 }
 </div>
 </div>
 <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-<button onclick="startChat(${
-business.id
-})" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
-<i class="fas fa-comment-dots"></i>
-<span>Contact</span>
+<button onclick="viewAndChat(${business.id})" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
+<i class="fas fa-eye mr-1"></i>
+<span>View & Contact</span>
 </button>
 </div>
 </div>
 `,
 )
 .join("");
+}
+
+// View business and track view count, then start chat
+function viewAndChat(businessId) {
+trackBusinessView(businessId);
+startChat(businessId);
 }
 
 function filterBusinesses() {
@@ -2233,38 +2205,38 @@ document.getElementById("customer-message-input").disabled = true;
 document.getElementById("customer-send-btn").disabled = true;
 return;
 }
+
+const businesses = getBusinesses();
 const business = businesses.find((b) => b.id === selectedBusinessId);
+
 if (!business) return;
+
 document.getElementById("customer-chat-business-name").textContent =
 business.name;
+
 // Render messages
 const messagesList = document.getElementById("customer-messages-list");
-const userMessages = business.messages.filter(
-(msg) => msg.sender === "customer",
-);
-const businessMessages = business.messages.filter(
-(msg) => msg.sender === "business",
-);
-if (userMessages.length === 0 && businessMessages.length === 0) {
+const allMessages = business.messages || [];
+
+if (allMessages.length === 0) {
 messagesList.innerHTML =
 '<p class="text-gray-500 text-center mt-8">Start a conversation with this business</p>';
 } else {
-messagesList.innerHTML = "";
-// Show all messages in order
-const allMessages = [...userMessages, ...businessMessages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-allMessages.forEach(msg => {
-const bubble = document.createElement("div");
-bubble.className = `chat-bubble ${msg.sender === "business" ? "business" : "customer"}`;
-bubble.innerHTML = `
+messagesList.innerHTML = allMessages
+.map(
+(msg) => `
+<div class="chat-bubble ${msg.sender === "business" ? "business" : "customer"}">
 <p class="text-gray-800">${msg.text}</p>
-<p class="text-xs text-gray-600 mt-1">${new Date(msg.timestamp).toLocaleTimeString()}</p>
-`;
-messagesList.appendChild(bubble);
-});
+<p class="text-xs text-gray-500 mt-1">${new Date(msg.timestamp).toLocaleTimeString()}</p>
+</div>
+`,
+)
+.join("");
 }
+
 // Render coupons
 const couponsList = document.getElementById("customer-coupons-list");
-if (business.coupons.length === 0) {
+if (!business.coupons || business.coupons.length === 0) {
 couponsList.innerHTML =
 '<p class="text-gray-600">No coupons available</p>';
 } else {
@@ -2284,6 +2256,7 @@ couponsList.innerHTML = business.coupons
 )
 .join("");
 }
+
 // Enable messaging
 document.getElementById("customer-message-input").disabled = false;
 document.getElementById("customer-send-btn").disabled = false;
@@ -2293,24 +2266,30 @@ function sendCustomerMessage() {
 if (!selectedBusinessId) return;
 const messageInput = document.getElementById("customer-message-input");
 const message = messageInput.value.trim();
+
 if (message) {
-const business = businesses.find((b) => b.id === selectedBusinessId);
-if (business) {
-business.messages.push({
+const businesses = getBusinesses();
+const index = businesses.findIndex((b) => b.id === selectedBusinessId);
+if (index !== -1) {
+if (!businesses[index].messages) businesses[index].messages = [];
+businesses[index].messages.push({
 id: Date.now(),
 text: message,
 sender: "customer",
-timestamp: new Date(),
+timestamp: new Date().toISOString()
 });
+saveBusinesses(businesses);
+}
 messageInput.value = "";
 renderCustomerMessages();
 }
 }
-}
 
-// Initialize
+// ===============================
+// Initialize App
+// ===============================
+updateStats();
 showLanding();
 </script>
 </body>
 </html>
-
